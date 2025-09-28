@@ -43,27 +43,30 @@ const BookingsTab = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
 
-  // Mock bookings data - replace with API call
+  // Enhanced mock bookings data with more realistic scenarios
+  // TODO: Replace with actual API call to fetch turf owner's bookings
+  // Backend Integration: GET /api/bookings/turf/{turfId}
+  // Should include customer details, payment status, and check-in information
   const [bookings, setBookings] = useState<Booking[]>([
     {
       id: '1',
       customerName: 'Rajesh Kumar',
       customerPhone: '+91 98765 43210',
       customerEmail: 'rajesh@email.com',
-      date: new Date('2024-01-15'),
-      timeSlot: '18:00 - 19:00',
-      amount: 1500,
+      date: new Date('2024-01-25'),
+      timeSlot: '18:00 - 20:00',
+      amount: 2400,
       status: 'confirmed',
       paymentStatus: 'partial',
       checkedIn: false,
-      specialRequests: 'Need extra footballs'
+      specialRequests: 'Need extra footballs and bibs for team match'
     },
     {
       id: '2',
       customerName: 'Priya Sharma',
       customerPhone: '+91 87654 32109',
       customerEmail: 'priya@email.com',
-      date: new Date('2024-01-15'),
+      date: new Date('2024-01-25'),
       timeSlot: '19:00 - 20:00',
       amount: 1800,
       status: 'completed',
@@ -75,11 +78,36 @@ const BookingsTab = () => {
       customerName: 'Amit Patil',
       customerPhone: '+91 76543 21098',
       customerEmail: 'amit@email.com',
-      date: new Date('2024-01-16'),
+      date: new Date('2024-01-26'),
       timeSlot: '17:00 - 18:00',
       amount: 1200,
       status: 'pending',
       paymentStatus: 'pending',
+      checkedIn: false
+    },
+    {
+      id: '4',
+      customerName: 'Sneha Reddy',
+      customerPhone: '+91 91234 56789',
+      customerEmail: 'sneha@email.com',
+      date: new Date('2024-01-26'),
+      timeSlot: '20:00 - 21:00',
+      amount: 1500,
+      status: 'confirmed',
+      paymentStatus: 'paid',
+      checkedIn: false,
+      specialRequests: 'Birthday celebration - need decoration permission'
+    },
+    {
+      id: '5',
+      customerName: 'Vikram Singh',
+      customerPhone: '+91 98765 11111',
+      customerEmail: 'vikram@email.com',
+      date: new Date('2024-01-27'),
+      timeSlot: '16:00 - 17:00',
+      amount: 1200,
+      status: 'cancelled',
+      paymentStatus: 'partial',
       checkedIn: false
     }
   ]);
