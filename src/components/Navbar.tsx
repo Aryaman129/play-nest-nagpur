@@ -8,9 +8,8 @@ const Navbar = () => {
 
   const menuItems = [
     { label: 'Find Turfs', href: '/turfs' },
-    { label: 'How it Works', href: '/#how-it-works' },
+    { label: 'My Booking', href: '/bookings' },
     { label: 'About', href: '/#about' },
-    { label: 'Contact', href: '/#contact' },
   ];
 
   return (
@@ -70,13 +69,6 @@ const Navbar = () => {
               <FaUser className="text-sm" />
               <span className="font-medium">Sign In</span>
             </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="btn-hero"
-            >
-              List Your Turf
-            </motion.button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -119,9 +111,6 @@ const Navbar = () => {
             <div className="pt-4 border-t border-border space-y-3">
               <button className="w-full text-left text-muted-foreground hover:text-primary transition-colors">
                 Sign In
-              </button>
-              <button className="w-full btn-hero text-center">
-                List Your Turf
               </button>
             </div>
           </div>
