@@ -1,20 +1,138 @@
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaMapMarkerAlt, FaList } from 'react-icons/fa';
+
+// Components
 import Navbar from '../components/Navbar';
-import FilterBar from '../components/FilterBar';
-import TurfCard from '../components/TurfCard';
+import { TurfFilters } from '../components/customer/FilterBar';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useAppToast } from '@/components/common/Toast';
+
+// Enhanced components with backend integration
+import TurfCard from '../components/enhanced/TurfCard';
+import FilterBar from '../components/enhanced/FilterBar';
+import MapView from '../components/enhanced/MapView';
+
+// Services and types
+import { turfService } from '@/services/turfs';
+import { Turf } from '@/types';
+
+// Mock data (replace with actual API calls)
+import { MOCK_TURFS } from '@/utils/mockData';
+
+// Asset imports
 import cricketTurf from '../assets/cricket-turf.jpg';
 import tennisTurf from '../assets/tennis-turf.jpg';
 import badmintonTurf from '../assets/badminton-turf.jpg';
 
 const TurfList = () => {
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-  const [loading, setLoading] = useState(false);
+  // Router navigation
+  const navigate = useNavigate();
+  const { error } = useAppToast();
 
-  // Mock data for turfs
-  const turfs = [
+  // Component state management
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [loading, setLoading] = useState(true);
+  const [turfs, setTurfs] = useState<Turf[]>([]);
+  const [filteredTurfs, setFilteredTurfs] = useState<Turf[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [filters, setFilters] = useState<TurfFilters>({
+    priceRange: [500, 3000],
+    sports: [],
+    size: '',
+    sortBy: 'distance',
+    distance: 10,
+    timeSlot: ''
+  });
+
+  // **BACKEND INTEGRATION POINT**
+  // Load turfs from API on component mount and when filters change
+  useEffect(() => {
+    loadTurfs();
+  }, [filters, currentPage]);
+
+  // **BACKEND INTEGRATION FUNCTION**
+  // This function should be replaced with actual API call to fetch turfs
+  const loadTurfs = async () => {
+    try {
+      setLoading(true);
+      
+      // TODO: Replace with actual API call
+      // const response = await turfService.getTurfs({
+      //   filters,
+      //   page: currentPage,
+      //   limit: 9
+      // });
+      
+      // Mock implementation - replace with backend call
+      let turfData = [...MOCK_TURFS];
+      
+      // Apply filters locally (this should be done on backend)
+      if (filters.sports.length > 0) {
+        turfData = turfData.filter(turf => 
+          turf.sports.some(sport => filters.sports.includes(sport))
+        );
+      }
+      
+      if (filters.priceRange) {
+        turfData = turfData.filter(turf => 
+          turf.basePrice >= filters.priceRange[0] && 
+          turf.basePrice <= filters.priceRange[1]
+        );
+      }
+      
+      // Apply sorting
+      switch (filters.sortBy) {
+        case 'price-low':
+          turfData.sort((a, b) => a.basePrice - b.basePrice);
+          break;
+        case 'price-high':
+          turfData.sort((a, b) => b.basePrice - a.basePrice);
+          break;
+        case 'rating':
+          turfData.sort((a, b) => b.rating - a.rating);
+          break;
+        case 'distance':
+        default:
+          // Sort by some default criteria since distance isn't in Turf type
+          turfData.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+      }
+      
+      setTurfs(turfData);
+      setFilteredTurfs(turfData);
+      setTotalPages(Math.ceil(turfData.length / 9));
+      
+    } catch (err) {
+      console.error('Error loading turfs:', err);
+      error('Error loading turfs', 'Failed to load turf listings. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (newFilters: TurfFilters) => {
+    setFilters(newFilters);
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  // Handle turf card click - navigate to turf detail page
+  const handleTurfClick = (turfId: string) => {
+    navigate(`/turf/${turfId}`);
+  };
+
+  // Handle load more turfs
+  const handleLoadMore = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  // Mock data structure for reference (remove when backend is connected)
+  const sampleTurfs = [
     {
       id: '1',
       name: 'Green Valley Sports Complex',
@@ -128,7 +246,7 @@ const TurfList = () => {
         </div>
       </div>
 
-      <FilterBar />
+      <FilterBar onFilterChange={handleFilterChange} />
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -149,7 +267,8 @@ const TurfList = () => {
                   >
                     <TurfCard 
                       turf={turf} 
-                      onClick={() => console.log('Navigate to booking:', turf.id)}
+                      onBookNow={() => navigate(`/booking/${turf.id}`)}
+                      onViewDetails={() => handleTurfClick(turf.id)}
                     />
                   </motion.div>
                 ))}

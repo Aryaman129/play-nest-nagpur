@@ -1,51 +1,56 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { motion } from "framer-motion";
-import Home from "./pages/Home";
-import TurfList from "./pages/TurfList";
-import AboutUs from "./pages/AboutUs";
-import Contact from "./pages/Contact";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import OwnerDashboard from "./pages/OwnerDashboard";
-import Booking from "./pages/Booking";
-import Profile from "./pages/Profile";
-import NotFound from "./pages/NotFound";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from '@/components/ui/sonner';
+// Context providers for global state management
+import { AuthProvider } from '@/contexts/AuthContext';
+import { BookingProvider } from '@/contexts/BookingContext';
 
-const queryClient = new QueryClient();
+// Page components
+import Home from '@/pages/Home';
+import TurfList from '@/pages/TurfList';
+import TurfDetail from '@/pages/TurfDetail';
+import Booking from '@/pages/Booking';
+import Profile from '@/pages/Profile';
+import OwnerDashboard from '@/pages/OwnerDashboard';
+import NotFound from '@/pages/NotFound';
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="min-h-screen bg-background"
-        >
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/turfs" element={<TurfList />} />
-            <Route path="/booking/:turfId" element={<Booking />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/owner" element={<OwnerDashboard />} />
-            <Route path="/about" element={<AboutUs />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfService />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </motion.div>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+import './App.css';
+
+function App() {
+  return (
+    // Global providers for authentication and booking state
+    // These contexts will handle all user sessions and booking flows
+    <AuthProvider>
+      <BookingProvider>
+        <Router>
+          <div className="App">
+            {/* Main routing configuration for the PlayNest platform */}
+            <Routes>
+              {/* Public routes - accessible without authentication */}
+              <Route path="/" element={<Home />} />
+              <Route path="/turfs" element={<TurfList />} />
+              <Route path="/turf/:id" element={<TurfDetail />} />
+              
+              {/* Protected routes - require user authentication */}
+              {/* Backend integration: These routes should check user authentication status */}
+              <Route path="/booking/:turfId" element={<Booking />} />
+              <Route path="/profile" element={<Profile />} />
+              
+              {/* Owner routes - require owner role verification */}
+              {/* Backend integration: Implement role-based access control */}
+              <Route path="/dashboard" element={<OwnerDashboard />} />
+              
+              {/* Fallback route for unmatched URLs */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            
+            {/* Global toast notifications for user feedback */}
+            {/* Used for success/error messages throughout the app */}
+            <Toaster />
+          </div>
+        </Router>
+      </BookingProvider>
+    </AuthProvider>
+  );
+}
 
 export default App;
