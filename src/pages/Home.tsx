@@ -8,7 +8,6 @@ import { turfService } from '@/services/turfs';
 import { Turf } from '@/types';
 import { useState, useEffect } from 'react';
 import heroTurf from '../assets/hero-turf.jpg';
-
 const Home = () => {
   // **BACKEND INTEGRATION POINT**
   // Featured turfs state - will be loaded from database
@@ -132,13 +131,7 @@ const Home = () => {
               Find Turfs Near Me
             </motion.button>
             
-            <motion.button whileHover={{
-            scale: 1.05
-          }} whileTap={{
-            scale: 0.95
-          }} className="px-8 py-4 border-2 border-white text-white rounded-xl font-semibold hover:bg-white hover:text-primary transition-all duration-300">
-              List Your Turf
-            </motion.button>
+            
           </motion.div>
         </div>
       </section>
@@ -205,38 +198,37 @@ const Home = () => {
           </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {loading ? (
-              // Loading skeleton for featured turfs
-              Array.from({ length: 3 }).map((_, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="bg-card rounded-2xl p-6 animate-pulse"
-                >
+            {loading ?
+          // Loading skeleton for featured turfs
+          Array.from({
+            length: 3
+          }).map((_, index) => <motion.div key={index} initial={{
+            opacity: 0,
+            y: 30
+          }} animate={{
+            opacity: 1,
+            y: 0
+          }} transition={{
+            duration: 0.5,
+            delay: index * 0.1
+          }} className="bg-card rounded-2xl p-6 animate-pulse">
                   <div className="h-48 bg-muted rounded-xl mb-4"></div>
                   <div className="h-6 bg-muted rounded mb-2"></div>
                   <div className="h-4 bg-muted rounded w-3/4"></div>
-                </motion.div>
-              ))
-            ) : (
-              featuredTurfs.map((turf, index) => (
-                <motion.div
-                  key={turf.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <TurfCard 
-                    turf={turf} 
-                    onBookNow={() => window.location.href = `/booking/${turf.id}`}
-                    onViewDetails={() => window.location.href = `/turf/${turf.id}`}
-                  />
-                </motion.div>
-              ))
-            )}
+                </motion.div>) : featuredTurfs.map((turf, index) => <motion.div key={turf.id} initial={{
+            opacity: 0,
+            y: 30
+          }} whileInView={{
+            opacity: 1,
+            y: 0
+          }} transition={{
+            duration: 0.5,
+            delay: index * 0.1
+          }} viewport={{
+            once: true
+          }}>
+                  <TurfCard turf={turf} onBookNow={() => window.location.href = `/booking/${turf.id}`} onViewDetails={() => window.location.href = `/turf/${turf.id}`} />
+                </motion.div>)}
           </div>
           
           <motion.div initial={{
