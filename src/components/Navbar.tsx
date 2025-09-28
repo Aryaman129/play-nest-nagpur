@@ -9,7 +9,8 @@ const Navbar = () => {
   const menuItems = [
     { label: 'Find Turfs', href: '/turfs' },
     { label: 'My Booking', href: '/bookings' },
-    { label: 'About', href: '/#about' },
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' },
   ];
 
   return (
