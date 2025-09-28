@@ -1,435 +1,232 @@
-import { useState } from 'react';
+// Enhanced PricingTab Component - Phase 4 Implementation
+// **BACKEND INTEGRATION**: All pricing data should be stored in database with real-time updates
+
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { DollarSign, Clock, Calendar, TrendingUp, Save, RotateCcw } from 'lucide-react';
+import { 
+  DollarSign, 
+  Clock, 
+  Calendar, 
+  TrendingUp, 
+  Settings,
+  Plus,
+  Edit,
+  Save,
+  X
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppToast } from '@/components/common/Toast';
 
+// **DATABASE INTEGRATION TYPES**
 interface PricingRule {
   id: string;
   name: string;
-  timeStart: string;
-  timeEnd: string;
-  price: number;
-  days: string[];
-  isActive: boolean;
-}
-
-interface DynamicRule {
-  id: string;
-  name: string;
+  timeSlot: string;
+  dayType: 'weekday' | 'weekend' | 'holiday';
+  basePrice: number;
   multiplier: number;
+  finalPrice: number;
   isActive: boolean;
-  description: string;
+  sport: string;
 }
 
 const PricingTab = () => {
   const { success, error } = useAppToast();
-  
-  const [basePrice, setBasePrice] = useState(1200);
-  const [isDynamicPricingEnabled, setIsDynamicPricingEnabled] = useState(true);
-  
+
+  // **BACKEND INTEGRATION STATE**
+  // All this data should come from database
   const [pricingRules, setPricingRules] = useState<PricingRule[]>([
     {
       id: '1',
-      name: 'Morning Discount',
-      timeStart: '06:00',
-      timeEnd: '10:00',
-      price: 800,
-      days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-      isActive: true
-    },
-    {
-      id: '2',
-      name: 'Peak Evening',
-      timeStart: '18:00',
-      timeEnd: '22:00',
-      price: 1800,
-      days: ['friday', 'saturday', 'sunday'],
-      isActive: true
-    },
-    {
-      id: '3',
-      name: 'Weekend Special',
-      timeStart: '10:00',
-      timeEnd: '18:00',
-      price: 1500,
-      days: ['saturday', 'sunday'],
-      isActive: true
-    }
-  ]);
-  
-  const [dynamicRules, setDynamicRules] = useState<DynamicRule[]>([
-    {
-      id: '1',
-      name: 'High Demand (80%+ bookings)',
-      multiplier: 1.2,
+      name: 'Morning Slot',
+      timeSlot: '06:00-12:00',
+      dayType: 'weekday',
+      basePrice: 1000,
+      multiplier: 0.8,
+      finalPrice: 800,
       isActive: true,
-      description: 'Increase price by 20% when demand is high'
+      sport: 'Football'
     },
     {
       id: '2',
-      name: 'Holiday Surcharge',
+      name: 'Evening Prime',
+      timeSlot: '18:00-22:00',
+      dayType: 'weekend',
+      basePrice: 1000,
       multiplier: 1.5,
+      finalPrice: 1500,
       isActive: true,
-      description: 'Increase price by 50% on public holidays'
-    },
-    {
-      id: '3',
-      name: 'Last Minute Booking',
-      multiplier: 1.1,
-      isActive: false,
-      description: 'Increase price by 10% for bookings made within 2 hours'
+      sport: 'Football'
     }
   ]);
 
-  const handleSaveBasicPricing = () => {
-    // Mock API call
-    setTimeout(() => {
-      success('Basic pricing updated successfully');
-    }, 500);
+  const [sports] = useState(['Football', 'Cricket', 'Tennis', 'Badminton']);
+  const [selectedSport, setSelectedSport] = useState('Football');
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  // **DATABASE INTEGRATION FUNCTION**
+  // Load pricing rules from database
+  useEffect(() => {
+    loadPricingRules();
+  }, [selectedSport]);
+
+  const loadPricingRules = async () => {
+    try {
+      // TODO: Replace with actual API call
+      // const response = await pricingService.getPricingRules(selectedSport);
+      console.log(`Loading pricing rules for ${selectedSport}`);
+    } catch (err) {
+      error('Failed to load pricing rules');
+    }
   };
 
-  const handleSaveTimeBasedPricing = () => {
-    // Mock API call
-    setTimeout(() => {
-      success('Time-based pricing rules updated');
-    }, 500);
-  };
-
-  const handleSaveDynamicPricing = () => {
-    // Mock API call
-    setTimeout(() => {
-      success('Dynamic pricing rules updated');
-    }, 500);
-  };
-
-  const addNewRule = () => {
-    const newRule: PricingRule = {
-      id: Date.now().toString(),
-      name: 'New Rule',
-      timeStart: '12:00',
-      timeEnd: '14:00',
-      price: basePrice,
-      days: ['monday'],
-      isActive: true
-    };
-    setPricingRules([...pricingRules, newRule]);
-  };
-
-  const updateRule = (id: string, updates: Partial<PricingRule>) => {
-    setPricingRules(prev => prev.map(rule => 
-      rule.id === id ? { ...rule, ...updates } : rule
-    ));
-  };
-
-  const deleteRule = (id: string) => {
-    setPricingRules(prev => prev.filter(rule => rule.id !== id));
-  };
-
-  const toggleDynamicRule = (id: string) => {
-    setDynamicRules(prev => prev.map(rule => 
-      rule.id === id ? { ...rule, isActive: !rule.isActive } : rule
-    ));
-  };
-
-  const dayNames = [
-    { key: 'monday', label: 'Mon' },
-    { key: 'tuesday', label: 'Tue' },
-    { key: 'wednesday', label: 'Wed' },
-    { key: 'thursday', label: 'Thu' },
-    { key: 'friday', label: 'Fri' },
-    { key: 'saturday', label: 'Sat' },
-    { key: 'sunday', label: 'Sun' }
-  ];
+  const filteredRules = pricingRules.filter(rule => rule.sport === selectedSport);
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="basic" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="basic">Basic Pricing</TabsTrigger>
-          <TabsTrigger value="time-based">Time-Based Rules</TabsTrigger>
-          <TabsTrigger value="dynamic">Dynamic Pricing</TabsTrigger>
-        </TabsList>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Pricing Management</h2>
+          <p className="text-muted-foreground">
+            Configure dynamic pricing for different time slots and days
+          </p>
+        </div>
+        <Button onClick={() => setShowAddForm(true)} className="flex items-center gap-2">
+          <Plus className="w-4 h-4" />
+          Add Pricing Rule
+        </Button>
+      </div>
 
-        {/* Basic Pricing */}
-        <TabsContent value="basic">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-primary" />
-                Base Pricing
-              </CardTitle>
-              <CardDescription>
-                Set your standard hourly rate for turf bookings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="basePrice" className="text-lg font-medium">
-                      Base Price per Hour
-                    </Label>
-                    <div className="relative mt-2">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                        ₹
-                      </span>
-                      <Input
-                        id="basePrice"
-                        type="number"
-                        value={basePrice}
-                        onChange={(e) => setBasePrice(Number(e.target.value))}
-                        className="pl-8 text-lg font-semibold"
-                        min="0"
-                        step="50"
-                      />
+      {/* Sport Filter */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Settings className="w-5 h-5" />
+            Sport Selection
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Select value={selectedSport} onValueChange={setSelectedSport}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Select sport" />
+            </SelectTrigger>
+            <SelectContent>
+              {sports.map(sport => (
+                <SelectItem key={sport} value={sport}>
+                  {sport}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
+      {/* Pricing Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/10 rounded-lg">
+                <DollarSign className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Average Price</p>
+                <p className="text-2xl font-bold">₹{Math.round(filteredRules.reduce((sum, rule) => sum + rule.finalPrice, 0) / filteredRules.length || 0)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-secondary/10 rounded-lg">
+                <Clock className="w-6 h-6 text-secondary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Active Rules</p>
+                <p className="text-2xl font-bold">{filteredRules.filter(r => r.isActive).length}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-accent/10 rounded-lg">
+                <TrendingUp className="w-6 h-6 text-accent" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Revenue Impact</p>
+                <p className="text-2xl font-bold text-green-600">+15%</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Pricing Rules List */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Pricing Rules for {selectedSport}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {filteredRules.map((rule) => (
+              <motion.div
+                key={rule.id}
+                layout
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="border rounded-lg p-4 space-y-4"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div>
+                      <h4 className="font-semibold">{rule.name}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {rule.timeSlot} • {rule.dayType}
+                      </p>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      This is your default rate when no other rules apply
-                    </p>
+                    <Badge variant={rule.isActive ? 'default' : 'secondary'}>
+                      {rule.isActive ? 'Active' : 'Inactive'}
+                    </Badge>
                   </div>
-                  
-                  <Button onClick={handleSaveBasicPricing} className="w-full">
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Base Price
-                  </Button>
                 </div>
                 
-                <div className="bg-muted/50 rounded-lg p-6">
-                  <h3 className="font-semibold mb-4">Pricing Preview</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>1 Hour:</span>
-                      <span className="font-semibold">₹{basePrice}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>2 Hours:</span>
-                      <span className="font-semibold">₹{basePrice * 2}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Half Day (4 hrs):</span>
-                      <span className="font-semibold">₹{basePrice * 4}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Full Day (8 hrs):</span>
-                      <span className="font-semibold">₹{basePrice * 8}</span>
-                    </div>
+                <div className="grid grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Base Price:</span>
+                    <p className="font-semibold">₹{rule.basePrice}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Multiplier:</span>
+                    <p className="font-semibold">{rule.multiplier}x</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Final Price:</span>
+                    <p className="font-semibold text-primary">₹{rule.finalPrice}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Impact:</span>
+                    <p className={`font-semibold ${rule.multiplier > 1 ? 'text-green-600' : rule.multiplier < 1 ? 'text-red-600' : 'text-gray-600'}`}>
+                      {rule.multiplier > 1 ? '+' : ''}{Math.round((rule.multiplier - 1) * 100)}%
+                    </p>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Time-Based Pricing */}
-        <TabsContent value="time-based">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-primary" />
-                Time-Based Pricing Rules
-              </CardTitle>
-              <CardDescription>
-                Set different prices for specific time slots and days
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Active Rules</h3>
-                <Button onClick={addNewRule} variant="outline">
-                  + Add New Rule
-                </Button>
-              </div>
-              
-              <div className="space-y-4">
-                {pricingRules.map((rule, index) => (
-                  <motion.div
-                    key={rule.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="card-turf"
-                  >
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <Input
-                          value={rule.name}
-                          onChange={(e) => updateRule(rule.id, { name: e.target.value })}
-                          className="font-semibold text-lg flex-1 mr-4"
-                        />
-                        <div className="flex items-center gap-2">
-                          <Switch
-                            checked={rule.isActive}
-                            onCheckedChange={(checked) => updateRule(rule.id, { isActive: checked })}
-                          />
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => deleteRule(rule.id)}
-                            className="text-destructive"
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                          <Label>Time Range</Label>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Input
-                              type="time"
-                              value={rule.timeStart}
-                              onChange={(e) => updateRule(rule.id, { timeStart: e.target.value })}
-                            />
-                            <span>to</span>
-                            <Input
-                              type="time"
-                              value={rule.timeEnd}
-                              onChange={(e) => updateRule(rule.id, { timeEnd: e.target.value })}
-                            />
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <Label>Price per Hour</Label>
-                          <div className="relative mt-1">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                              ₹
-                            </span>
-                            <Input
-                              type="number"
-                              value={rule.price}
-                              onChange={(e) => updateRule(rule.id, { price: Number(e.target.value) })}
-                              className="pl-8"
-                              min="0"
-                              step="50"
-                            />
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <Label>Active Days</Label>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {dayNames.map((day) => (
-                              <button
-                                key={day.key}
-                                onClick={() => {
-                                  const isSelected = rule.days.includes(day.key);
-                                  const newDays = isSelected
-                                    ? rule.days.filter(d => d !== day.key)
-                                    : [...rule.days, day.key];
-                                  updateRule(rule.id, { days: newDays });
-                                }}
-                                className={`px-2 py-1 text-xs rounded transition-colors ${
-                                  rule.days.includes(day.key)
-                                    ? 'bg-primary text-primary-foreground'
-                                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                                }`}
-                              >
-                                {day.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-              
-              <Button onClick={handleSaveTimeBasedPricing} className="w-full">
-                <Save className="w-4 h-4 mr-2" />
-                Save Time-Based Rules
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Dynamic Pricing */}
-        <TabsContent value="dynamic">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-primary" />
-                Dynamic Pricing
-              </CardTitle>
-              <CardDescription>
-                Automatically adjust prices based on demand and other factors
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                <div>
-                  <h3 className="font-semibold">Enable Dynamic Pricing</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Automatically adjust prices based on the rules below
-                  </p>
-                </div>
-                <Switch
-                  checked={isDynamicPricingEnabled}
-                  onCheckedChange={setIsDynamicPricingEnabled}
-                />
-              </div>
-              
-              {isDynamicPricingEnabled && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Dynamic Rules</h3>
-                  
-                  {dynamicRules.map((rule, index) => (
-                    <motion.div
-                      key={rule.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="card-turf"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-foreground">{rule.name}</h4>
-                          <p className="text-sm text-muted-foreground">{rule.description}</p>
-                          <div className="mt-2">
-                            <span className="text-sm font-medium">
-                              Price Multiplier: {rule.multiplier}x 
-                              <span className="text-primary ml-2">
-                                ({rule.multiplier > 1 ? '+' : ''}{((rule.multiplier - 1) * 100).toFixed(0)}%)
-                              </span>
-                            </span>
-                          </div>
-                        </div>
-                        <Switch
-                          checked={rule.isActive}
-                          onCheckedChange={() => toggleDynamicRule(rule.id)}
-                        />
-                      </div>
-                    </motion.div>
-                  ))}
-                  
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h4 className="font-semibold text-blue-900 mb-2">How Dynamic Pricing Works</h4>
-                    <ul className="text-sm text-blue-800 space-y-1">
-                      <li>• Rules are applied in order of priority</li>
-                      <li>• Multiple rules can be active simultaneously</li>
-                      <li>• Final price = Base Price × Active Multipliers</li>
-                      <li>• Customers see the final price before booking</li>
-                    </ul>
-                  </div>
-                </div>
-              )}
-              
-              <Button onClick={handleSaveDynamicPricing} className="w-full">
-                <Save className="w-4 h-4 mr-2" />
-                Save Dynamic Pricing Settings
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              </motion.div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

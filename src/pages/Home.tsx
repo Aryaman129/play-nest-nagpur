@@ -3,41 +3,41 @@ import { FaSearch, FaMapMarkerAlt, FaCalendarAlt, FaCreditCard, FaStar } from 'r
 import { MdSportsSoccer, MdSportsCricket, MdSportsTennis } from 'react-icons/md';
 import { IoTennisball } from 'react-icons/io5';
 import Navbar from '../components/Navbar';
-import TurfCard from '../components/TurfCard';
+import TurfCard from '../components/enhanced/TurfCard';
+import { turfService } from '@/services/turfs';
+import { Turf } from '@/types';
+import { useState, useEffect } from 'react';
 import heroTurf from '../assets/hero-turf.jpg';
-import cricketTurf from '../assets/cricket-turf.jpg';
-import tennisTurf from '../assets/tennis-turf.jpg';
-import badmintonTurf from '../assets/badminton-turf.jpg';
+
 const Home = () => {
-  // Mock data for featured turfs
-  const featuredTurfs = [{
-    id: '1',
-    name: 'Green Valley Sports Complex',
-    address: 'Dharampeth, Nagpur',
-    basePrice: 800,
-    rating: 4.8,
-    sports: ['football', 'cricket'],
-    image: cricketTurf,
-    distance: 2.5
-  }, {
-    id: '2',
-    name: 'Champions Tennis Arena',
-    address: 'Civil Lines, Nagpur',
-    basePrice: 600,
-    rating: 4.6,
-    sports: ['tennis', 'badminton'],
-    image: tennisTurf,
-    distance: 3.2
-  }, {
-    id: '3',
-    name: 'Victory Badminton Hub',
-    address: 'Sadar, Nagpur',
-    basePrice: 400,
-    rating: 4.7,
-    sports: ['badminton'],
-    image: badmintonTurf,
-    distance: 1.8
-  }];
+  // **BACKEND INTEGRATION POINT**
+  // Featured turfs state - will be loaded from database
+  const [featuredTurfs, setFeaturedTurfs] = useState<Turf[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // **BACKEND INTEGRATION FUNCTION**
+  // Load featured turfs on component mount
+  useEffect(() => {
+    loadFeaturedTurfs();
+  }, []);
+
+  // **DATABASE INTEGRATION COMMENT**
+  // This function will fetch popular/featured turfs from the database
+  // Replace with: const response = await turfService.getPopularTurfs();
+  const loadFeaturedTurfs = async () => {
+    try {
+      setLoading(true);
+      // TODO: Replace with actual API call when database is connected
+      const response = await turfService.getPopularTurfs();
+      setFeaturedTurfs(response.data.slice(0, 3)); // Show only top 3 featured
+    } catch (error) {
+      console.error('Error loading featured turfs:', error);
+      // Fallback to empty array if loading fails
+      setFeaturedTurfs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
   const howItWorksSteps = [{
     icon: <FaSearch />,
     title: 'Search & Browse',
@@ -205,20 +205,38 @@ const Home = () => {
           </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredTurfs.map((turf, index) => <motion.div key={turf.id} initial={{
-            opacity: 0,
-            y: 30
-          }} whileInView={{
-            opacity: 1,
-            y: 0
-          }} transition={{
-            duration: 0.5,
-            delay: index * 0.1
-          }} viewport={{
-            once: true
-          }}>
-                <TurfCard turf={turf} />
-              </motion.div>)}
+            {loading ? (
+              // Loading skeleton for featured turfs
+              Array.from({ length: 3 }).map((_, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="bg-card rounded-2xl p-6 animate-pulse"
+                >
+                  <div className="h-48 bg-muted rounded-xl mb-4"></div>
+                  <div className="h-6 bg-muted rounded mb-2"></div>
+                  <div className="h-4 bg-muted rounded w-3/4"></div>
+                </motion.div>
+              ))
+            ) : (
+              featuredTurfs.map((turf, index) => (
+                <motion.div
+                  key={turf.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <TurfCard 
+                    turf={turf} 
+                    onBookNow={() => window.location.href = `/booking/${turf.id}`}
+                    onViewDetails={() => window.location.href = `/turf/${turf.id}`}
+                  />
+                </motion.div>
+              ))
+            )}
           </div>
           
           <motion.div initial={{
