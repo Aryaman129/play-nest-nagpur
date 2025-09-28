@@ -335,9 +335,7 @@ const Home = () => {
                 <MdSportsSoccer className="text-2xl text-primary" />
                 <span className="text-xl font-bold">PlayNest</span>
               </div>
-              <p className="text-white/70 mb-4">
-                Your trusted partner for sports venue bookings in Nagpur.
-              </p>
+              <p className="text-white/70 mb-4">Your trusted partner for sports venue bookings.</p>
               <div className="flex gap-4">
                 {/* Social media icons would go here */}
               </div>
@@ -349,7 +347,7 @@ const Home = () => {
                 <li><a href="#" className="hover:text-white transition-colors">Find Turfs</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Book Online</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">My Bookings</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
+                
               </ul>
             </div>
             
