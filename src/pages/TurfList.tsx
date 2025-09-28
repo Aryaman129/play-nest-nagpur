@@ -18,40 +18,8 @@ import MapView from '../components/enhanced/MapView';
 import { turfService } from '@/services/turfs';
 import { Turf } from '@/types';
 
-// Simple mock data to avoid import issues
-const mockTurfsData: Turf[] = [
-  {
-    id: '1',
-    name: 'Green Valley Sports Complex',
-    description: 'Premium sports facility',
-    location: {
-      lat: 28.6139,
-      lng: 77.2090,
-      address: 'Sector 18, Near Metro Station',
-      city: 'Delhi',
-      state: 'Delhi',
-      pincode: '110001',
-    },
-    basePrice: 1200,
-    sports: ['Football', 'Cricket'],
-    photos: ['/assets/hero-turf.jpg'],
-    idealPlayers: 22,
-    amenities: [],
-    rating: 4.8,
-    totalReviews: 156,
-    ownerId: '2',
-    verified: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    availability: {
-      openTime: '06:00',
-      closeTime: '22:00',
-      daysOpen: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-    },
-    rules: [],
-    size: { length: 100, width: 60, unit: 'm' },
-  }
-];
+// Import consistent mock data
+import { MOCK_TURFS } from '@/utils/mockData';
 
 const TurfList = () => {
   // Router navigation
@@ -94,7 +62,7 @@ const TurfList = () => {
       // });
       
       // Mock implementation - replace with backend call
-      let turfData = [...mockTurfsData];
+      let turfData = [...MOCK_TURFS];
       
       // Apply filters locally (this should be done on backend)
       if (filters.sports.length > 0) {

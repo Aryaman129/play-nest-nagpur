@@ -76,11 +76,7 @@ const Register = () => {
       errors.phone = 'Please enter a valid phone number';
     }
     
-    // Owner-specific validations
-    if (formData.role === 'owner') {
-      if (!formData.businessName) errors.businessName = 'Business name is required for owners';
-      if (!formData.businessAddress) errors.businessAddress = 'Business address is required for owners';
-    }
+    // Note: Owner registration removed - only customers can register
     
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -122,14 +118,7 @@ const Register = () => {
     }
   };
 
-  // Handle role change
-  const handleRoleChange = (role: 'customer' | 'owner') => {
-    setFormData(prev => ({ ...prev, role }));
-    // Clear business fields if switching to customer
-    if (role === 'customer') {
-      setFormData(prev => ({ ...prev, businessName: '', businessAddress: '' }));
-    }
-  };
+  // Note: Role is fixed to customer - no role switching needed
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center p-4">
@@ -157,33 +146,30 @@ const Register = () => {
                 </Alert>
               )}
 
-              {/* Account Type Selection */}
+              {/* Account Type - Customer Only */}
               <div className="space-y-3">
-                <Label>I want to:</Label>
-                <RadioGroup
-                  value={formData.role}
-                  onValueChange={(value: 'customer' | 'owner') => handleRoleChange(value)}
-                  className="grid grid-cols-2 gap-4"
-                >
-                  <div className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-muted/50 cursor-pointer">
-                    <RadioGroupItem value="customer" id="customer" />
-                    <Label htmlFor="customer" className="cursor-pointer flex-1">
-                      <div>
-                        <div className="font-medium">Book Sports Turfs</div>
-                        <div className="text-sm text-muted-foreground">Find and book sports facilities</div>
-                      </div>
-                    </Label>
+                <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm">✓</span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-foreground">Customer Account</div>
+                      <div className="text-sm text-muted-foreground">Find and book sports facilities across Nagpur</div>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-muted/50 cursor-pointer">
-                    <RadioGroupItem value="owner" id="owner" />
-                    <Label htmlFor="owner" className="cursor-pointer flex-1">
-                      <div>
-                        <div className="font-medium">List My Turf</div>
-                        <div className="text-sm text-muted-foreground">Rent out sports facilities</div>
-                      </div>
-                    </Label>
+                </div>
+                <div className="bg-muted/30 border border-border rounded-lg p-4 opacity-60">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-6 h-6 bg-muted border border-border rounded-full flex items-center justify-center">
+                      <span className="text-muted-foreground text-sm">🔒</span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-muted-foreground">Turf Owner Account</div>
+                      <div className="text-sm text-muted-foreground">Contact admin to register as turf owner</div>
+                    </div>
                   </div>
-                </RadioGroup>
+                </div>
               </div>
 
               {/* Personal Information */}
@@ -308,59 +294,7 @@ const Register = () => {
                 </div>
               </div>
 
-              {/* Business Information (Owner Only) */}
-              {formData.role === 'owner' && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="space-y-4 border-t pt-6"
-                >
-                  <h3 className="text-lg font-semibold">Business Information</h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Business Name */}
-                    <div className="space-y-2">
-                      <Label htmlFor="businessName">Business Name *</Label>
-                      <div className="relative">
-                        <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="businessName"
-                          type="text"
-                          placeholder="Enter business name"
-                          value={formData.businessName}
-                          onChange={(e) => handleInputChange('businessName', e.target.value)}
-                          className={`pl-10 ${formErrors.businessName ? 'border-destructive' : ''}`}
-                          disabled={isSubmitting}
-                        />
-                      </div>
-                      {formErrors.businessName && (
-                        <p className="text-sm text-destructive">{formErrors.businessName}</p>
-                      )}
-                    </div>
-
-                    {/* Business Address */}
-                    <div className="space-y-2">
-                      <Label htmlFor="businessAddress">Business Address *</Label>
-                      <div className="relative">
-                        <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="businessAddress"
-                          type="text"
-                          placeholder="Enter business address"
-                          value={formData.businessAddress}
-                          onChange={(e) => handleInputChange('businessAddress', e.target.value)}
-                          className={`pl-10 ${formErrors.businessAddress ? 'border-destructive' : ''}`}
-                          disabled={isSubmitting}
-                        />
-                      </div>
-                      {formErrors.businessAddress && (
-                        <p className="text-sm text-destructive">{formErrors.businessAddress}</p>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
+              {/* Note: Business information removed - only customer registration allowed */}
 
               {/* Terms and Conditions */}
               <div className="space-y-2">
