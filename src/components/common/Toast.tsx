@@ -11,19 +11,14 @@ export const useAppToast = () => {
     description?: string
   ) => {
     const icons = {
-      success: <CheckCircle className="w-5 h-5 text-emerald-500" />,
-      error: <XCircle className="w-5 h-5 text-red-500" />,
-      warning: <AlertCircle className="w-5 h-5 text-amber-500" />,
-      info: <Info className="w-5 h-5 text-blue-500" />
+      success: '✅',
+      error: '❌',
+      warning: '⚠️',
+      info: 'ℹ️'
     };
 
     toast({
-      title: (
-        <div className="flex items-center gap-2">
-          {icons[type]}
-          {title}
-        </div>
-      ),
+      title: `${icons[type]} ${title}`,
       description,
       duration: type === 'error' ? 5000 : 3000,
     });
@@ -36,22 +31,7 @@ export const useAppToast = () => {
 
   const bookingSuccess = () => {
     toast({
-      title: (
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="flex items-center gap-2"
-        >
-          <motion.div
-            initial={{ rotate: -45 }}
-            animate={{ rotate: 0 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-          >
-            🏀
-          </motion.div>
-          Booking Confirmed!
-        </motion.div>
-      ),
+      title: "🏀 Booking Confirmed!",
       description: 'Your turf has been booked successfully. Check your profile for details.',
       duration: 4000,
     });
