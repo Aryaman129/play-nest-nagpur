@@ -403,13 +403,7 @@ const Home = () => {
               <p className="text-white/60 text-center md:text-left">
                 © 2024 PlayNest. All rights reserved. Made for sports lovers.
               </p>
-              <div className="flex items-center gap-6 text-sm text-white/60">
-                <a href="#" className="hover:text-white transition-colors">Contact</a>
-                <span>•</span>
-                <a href="#" className="hover:text-white transition-colors">Support</a>
-                <span>•</span>
-                <a href="#" className="hover:text-white transition-colors">Help</a>
-              </div>
+              
             </div>
           </div>
         </div>
