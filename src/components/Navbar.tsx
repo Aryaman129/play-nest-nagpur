@@ -2,9 +2,11 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { FaBars, FaTimes, FaUser, FaSearch } from 'react-icons/fa';
 import { MdSportsSoccer } from 'react-icons/md';
+import { Link, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
   const menuItems = [
     { label: 'Home', href: '/' },
@@ -24,33 +26,39 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <div className="text-primary text-2xl">
-              <MdSportsSoccer />
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              PlayNest
-            </span>
-          </motion.div>
+          <Link to="/">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <div className="text-primary text-2xl">
+                <MdSportsSoccer />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                PlayNest
+              </span>
+            </motion.div>
+          </Link>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
             {menuItems.map((item) => (
-              <motion.a
-                key={item.label}
-                href={item.href}
-                whileHover={{ y: -2 }}
-                className="text-foreground hover:text-primary transition-colors font-medium relative group"
-              >
-                {item.label}
+              <Link key={item.label} to={item.href}>
                 <motion.div
-                  className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"
-                  whileHover={{ width: '100%' }}
-                />
-              </motion.a>
+                  whileHover={{ y: -2 }}
+                  className={`text-foreground hover:text-primary transition-colors font-medium relative group ${
+                    location.pathname === item.href ? 'text-primary' : ''
+                  }`}
+                >
+                  {item.label}
+                  <motion.div
+                    className={`absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300 ${
+                      location.pathname === item.href ? 'w-full' : 'w-0 group-hover:w-full'
+                    }`}
+                    whileHover={{ width: '100%' }}
+                  />
+                </motion.div>
+              </Link>
             ))}
           </div>
 
@@ -95,20 +103,22 @@ const Navbar = () => {
         >
           <div className="py-4 space-y-4">
             {menuItems.map((item, index) => (
-              <motion.a
-                key={item.label}
-                href={item.href}
-                initial={{ x: -20, opacity: 0 }}
-                animate={{
-                  x: isMenuOpen ? 0 : -20,
-                  opacity: isMenuOpen ? 1 : 0,
-                }}
-                transition={{ delay: index * 0.1 }}
-                className="block text-foreground hover:text-primary transition-colors font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.label}
-              </motion.a>
+              <Link key={item.label} to={item.href}>
+                <motion.div
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{
+                    x: isMenuOpen ? 0 : -20,
+                    opacity: isMenuOpen ? 1 : 0,
+                  }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`block text-foreground hover:text-primary transition-colors font-medium ${
+                    location.pathname === item.href ? 'text-primary' : ''
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.label}
+                </motion.div>
+              </Link>
             ))}
             <div className="pt-4 border-t border-border space-y-3">
               <button className="w-full text-left text-muted-foreground hover:text-primary transition-colors">
