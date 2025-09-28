@@ -128,21 +128,8 @@ const BookingsList = () => {
     );
   };
 
-  const handleCancelBooking = async (bookingId: string) => {
-    // TODO: Implement booking cancellation
-    // Backend Integration: POST /api/bookings/{bookingId}/cancel
-    // Should handle refund logic and cancellation policies
-    try {
-      setBookings(prev => prev.map(booking => 
-        booking.id === bookingId 
-          ? { ...booking, status: 'canceled' as const }
-          : booking
-      ));
-      success('Booking cancelled successfully');
-    } catch (err) {
-      error('Failed to cancel booking');
-    }
-  };
+  // Cancel functionality removed as per user request
+  // Backend Integration: POST /api/bookings/{bookingId}/cancel for future implementation
 
   const handleDownloadReceipt = async (bookingId: string) => {
     // TODO: Implement receipt download
@@ -310,16 +297,6 @@ const BookingsList = () => {
                     </div>
                   </DialogContent>
                 </Dialog>
-                
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleCancelBooking(booking.id)}
-                  className="flex items-center gap-2"
-                >
-                  <X className="w-4 h-4" />
-                  Cancel
-                </Button>
               </>
             )}
           </div>
