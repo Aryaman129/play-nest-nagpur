@@ -17,6 +17,7 @@ import Booking from '@/pages/Booking';
 import Profile from '@/pages/Profile';
 import Bookings from '@/pages/Bookings';
 import OwnerDashboard from '@/pages/OwnerDashboard';
+import AdminDashboard from '@/pages/AdminDashboard';
 import AboutUs from '@/pages/AboutUs';
 import Contact from '@/pages/Contact';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
@@ -70,6 +71,13 @@ function App() {
               <Route path="/owner-dashboard" element={
                 <ProtectedRoute requiredRole="owner">
                   <OwnerDashboard />
+                </ProtectedRoute>
+              } />
+              
+              {/* Admin-Only Routes */}
+              <Route path="/admin-dashboard" element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminDashboard />
                 </ProtectedRoute>
               } />
               

@@ -350,7 +350,7 @@ export const ProtectedRoute: React.FC<{
     return <div className="flex justify-center items-center min-h-screen">Please login to continue</div>;
   }
 
-  if (requiredRole && user.role !== requiredRole && user.role !== 'admin') {
+  if (requiredRole && user.role !== requiredRole) {
     return <>{fallback}</>;
   }
 

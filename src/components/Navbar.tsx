@@ -49,15 +49,23 @@ const Navbar = () => {
     ];
 
     const ownerItems = [
-      { path: '/owner-dashboard', label: 'Dashboard', icon: Building },
+      { path: '/owner-dashboard', label: 'Owner Dashboard', icon: Building },
+    ];
+
+    const adminItems = [
+      { path: '/admin-dashboard', label: 'Admin Dashboard', icon: Building },
     ];
 
     if (!isAuthenticated) return baseItems;
     
     let items = [...baseItems, ...authenticatedItems];
     
-    if (isOwner() || isAdmin()) {
+    if (isOwner()) {
       items.push(...ownerItems);
+    }
+    
+    if (isAdmin()) {
+      items.push(...adminItems);
     }
     
     return items;
@@ -174,10 +182,16 @@ const Navbar = () => {
                     <Calendar className="mr-2 h-4 w-4" />
                     <span>My Bookings</span>
                   </DropdownMenuItem>
-                  {(isOwner() || isAdmin()) && (
+                  {isOwner() && (
                     <DropdownMenuItem onClick={() => navigate('/owner-dashboard')}>
                       <Building className="mr-2 h-4 w-4" />
-                      <span>Dashboard</span>
+                      <span>Owner Dashboard</span>
+                    </DropdownMenuItem>
+                  )}
+                  {isAdmin() && (
+                    <DropdownMenuItem onClick={() => navigate('/admin-dashboard')}>
+                      <Building className="mr-2 h-4 w-4" />
+                      <span>Admin Dashboard</span>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
@@ -278,14 +292,24 @@ const Navbar = () => {
                       <Calendar className="w-5 h-5" />
                       My Bookings
                     </Link>
-                    {(isOwner() || isAdmin()) && (
+                    {isOwner() && (
                       <Link
                         to="/owner-dashboard"
                         onClick={() => setIsMenuOpen(false)}
                         className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium text-foreground hover:text-primary hover:bg-muted"
                       >
                         <Building className="w-5 h-5" />
-                        Dashboard
+                        Owner Dashboard
+                      </Link>
+                    )}
+                    {isAdmin() && (
+                      <Link
+                        to="/admin-dashboard"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium text-foreground hover:text-primary hover:bg-muted"
+                      >
+                        <Building className="w-5 h-5" />
+                        Admin Dashboard
                       </Link>
                     )}
                     <button
