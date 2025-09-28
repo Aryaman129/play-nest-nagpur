@@ -18,13 +18,40 @@ import MapView from '../components/enhanced/MapView';
 import { turfService } from '@/services/turfs';
 import { Turf } from '@/types';
 
-// Mock data (replace with actual API calls)
-import { MOCK_TURFS } from '@/utils/mockData';
-
-// Asset imports
-import cricketTurf from '../assets/cricket-turf.jpg';
-import tennisTurf from '../assets/tennis-turf.jpg';
-import badmintonTurf from '../assets/badminton-turf.jpg';
+// Simple mock data to avoid import issues
+const mockTurfsData: Turf[] = [
+  {
+    id: '1',
+    name: 'Green Valley Sports Complex',
+    description: 'Premium sports facility',
+    location: {
+      lat: 28.6139,
+      lng: 77.2090,
+      address: 'Sector 18, Near Metro Station',
+      city: 'Delhi',
+      state: 'Delhi',
+      pincode: '110001',
+    },
+    basePrice: 1200,
+    sports: ['Football', 'Cricket'],
+    photos: ['/assets/hero-turf.jpg'],
+    idealPlayers: 22,
+    amenities: [],
+    rating: 4.8,
+    totalReviews: 156,
+    ownerId: '2',
+    verified: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    availability: {
+      openTime: '06:00',
+      closeTime: '22:00',
+      daysOpen: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    },
+    rules: [],
+    size: { length: 100, width: 60, unit: 'm' },
+  }
+];
 
 const TurfList = () => {
   // Router navigation
@@ -67,7 +94,7 @@ const TurfList = () => {
       // });
       
       // Mock implementation - replace with backend call
-      let turfData = [...MOCK_TURFS];
+      let turfData = [...mockTurfsData];
       
       // Apply filters locally (this should be done on backend)
       if (filters.sports.length > 0) {
@@ -131,69 +158,6 @@ const TurfList = () => {
     }
   };
 
-  // Mock data structure for reference (remove when backend is connected)
-  const sampleTurfs = [
-    {
-      id: '1',
-      name: 'Green Valley Sports Complex',
-      address: 'Dharampeth, Nagpur',
-      basePrice: 800,
-      rating: 4.8,
-      sports: ['football', 'cricket'],
-      image: cricketTurf,
-      distance: 2.5,
-    },
-    {
-      id: '2',
-      name: 'Champions Tennis Arena',
-      address: 'Civil Lines, Nagpur',
-      basePrice: 600,
-      rating: 4.6,
-      sports: ['tennis', 'badminton'],
-      image: tennisTurf,
-      distance: 3.2,
-    },
-    {
-      id: '3',
-      name: 'Victory Badminton Hub',
-      address: 'Sadar, Nagpur',
-      basePrice: 400,
-      rating: 4.7,
-      sports: ['badminton'],
-      image: badmintonTurf,
-      distance: 1.8,
-    },
-    {
-      id: '4',
-      name: 'Striker Football Academy',
-      address: 'Hingna, Nagpur',
-      basePrice: 1000,
-      rating: 4.9,
-      sports: ['football'],
-      image: cricketTurf,
-      distance: 5.2,
-    },
-    {
-      id: '5',
-      name: 'Royal Cricket Ground',
-      address: 'Kamptee Road, Nagpur',
-      basePrice: 900,
-      rating: 4.5,
-      sports: ['cricket'],
-      image: cricketTurf,
-      distance: 4.1,
-    },
-    {
-      id: '6',
-      name: 'Ace Tennis Courts',
-      address: 'Ramdaspeth, Nagpur',
-      basePrice: 550,
-      rating: 4.4,
-      sports: ['tennis'],
-      image: tennisTurf,
-      distance: 2.8,
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-background">

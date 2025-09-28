@@ -38,6 +38,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  // Authentication state using React hooks
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     isLoading: true,
