@@ -327,7 +327,7 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-br from-foreground via-foreground to-foreground/95 text-white py-20">
+      <footer className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-12 lg:gap-16">
             {/* Brand Section */}
