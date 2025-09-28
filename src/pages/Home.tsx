@@ -122,11 +122,16 @@ const Home = () => {
           duration: 0.8,
           delay: 0.4
         }} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <motion.button whileHover={{
-            scale: 1.05
-          }} whileTap={{
-            scale: 0.95
-          }} className="btn-hero text-lg px-8 py-4">
+            <motion.button 
+              whileHover={{
+                scale: 1.05
+              }} 
+              whileTap={{
+                scale: 0.95
+              }} 
+              className="btn-hero text-lg px-8 py-4"
+              onClick={() => window.location.href = '/turfs?filter=nearme'}
+            >
               <FaSearch className="inline mr-2" />
               Find Turfs Near Me
             </motion.button>
