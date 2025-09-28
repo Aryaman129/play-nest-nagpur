@@ -343,18 +343,7 @@ const Home = () => {
               <p className="text-lg text-white/80 mb-6 max-w-md leading-relaxed">
                 Your trusted partner for sports venue bookings. Connect with the best sports facilities and book your perfect game time.
               </p>
-              <div className="flex gap-4">
-                {/* Social media icons placeholder */}
-                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
-                  <span className="text-sm">FB</span>
-                </div>
-                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
-                  <span className="text-sm">TW</span>
-                </div>
-                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
-                  <span className="text-sm">IG</span>
-                </div>
-              </div>
+              
             </div>
             
             {/* For Players Section */}
