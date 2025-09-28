@@ -12,7 +12,7 @@ import {
   MapPin,
   Star,
   BarChart3,
-  PieChart,
+  PieChart as PieChartIcon,
   Download,
   Filter,
   RefreshCw
