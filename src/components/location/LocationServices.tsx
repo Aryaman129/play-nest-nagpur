@@ -121,19 +121,19 @@ const LocationServices = ({ destination, onLocationUpdate, showDirections = fals
           getDirections(locationData, destination);
         }
       },
-      (error) => {
+      (geolocationError) => {
         setLoading(false);
         let errorMessage = 'Failed to get location';
         
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
+        switch (geolocationError.code) {
+          case geolocationError.PERMISSION_DENIED:
             errorMessage = 'Location access denied by user';
             setPermissionStatus('denied');
             break;
-          case error.POSITION_UNAVAILABLE:
+          case geolocationError.POSITION_UNAVAILABLE:
             errorMessage = 'Location information is unavailable';
             break;
-          case error.TIMEOUT:
+          case geolocationError.TIMEOUT:
             errorMessage = 'Location request timed out';
             break;
         }

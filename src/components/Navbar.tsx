@@ -4,15 +4,18 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Menu, X, User, LogOut, Settings, MapPin, Calendar, Building, Search } from 'lucide-react';
+import { Menu, X, User, LogOut, Settings, MapPin, Calendar, Building, Search, Bell } from 'lucide-react';
 import { MdSportsSoccer } from 'react-icons/md';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/EnhancedAuthContext';
+import NotificationCenter from '@/components/notifications/NotificationCenter';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, isOwner, isCustomer, isAdmin } = useAuth();
@@ -118,7 +121,24 @@ const Navbar = () => {
           {/* User Actions */}
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
-              // Authenticated User Menu
+              <div className="flex items-center space-x-4">
+                {/* Notifications */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowNotifications(true)}
+                  className="relative"
+                >
+                  <Bell className="h-5 w-5" />
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
+                  >
+                    3
+                  </Badge>
+                </Button>
+
+                {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -164,6 +184,7 @@ const Navbar = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              </div>
             ) : (
               // Guest User Actions
               <div className="flex items-center space-x-3">
@@ -304,6 +325,12 @@ const Navbar = () => {
           </div>
         </motion.div>
       </div>
+
+      {/* Notification Center */}
+      <NotificationCenter
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+      />
     </motion.nav>
   );
 };
