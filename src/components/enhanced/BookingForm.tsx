@@ -24,6 +24,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAppToast } from '@/components/common/Toast';
 import { Turf, TimeSlot } from '@/types/turf';
 import { BookingRequest } from '@/types/booking';
+import PaymentGateway from '@/components/payment/PaymentGateway';
 
 interface BookingFormProps {
   turf: Turf;
@@ -69,33 +70,44 @@ const BookingForm = ({ turf, selectedSlot, selectedDate, onBookingComplete, onCa
       return;
     }
 
-    setLoading(true);
-    
-    try {
-      // TODO: Replace with actual booking API call
-      // Backend Integration: POST /api/bookings
-      const bookingData: BookingRequest = {
-        turfId: turf.id,
-        customerId: 'current_user_id',
-        slotStart: new Date(selectedDate.setHours(parseInt(selectedSlot.startTime.split(':')[0]))),
-        slotEnd: new Date(selectedDate.setHours(parseInt(selectedSlot.endTime.split(':')[0]))),
-        customerDetails,
-        paymentMethod,
-        notes: specialRequests,
-      };
+    if (paymentMethod === 'online') {
+      // Proceed to payment for online bookings
+      setStep(3);
+    } else {
+      // For cash bookings, create booking directly
+      setLoading(true);
+      try {
+        const bookingData: BookingRequest = {
+          turfId: turf.id,
+          customerId: 'current_user_id',
+          slotStart: new Date(selectedDate.setHours(parseInt(selectedSlot.startTime.split(':')[0]))),
+          slotEnd: new Date(selectedDate.setHours(parseInt(selectedSlot.endTime.split(':')[0]))),
+          customerDetails,
+          paymentMethod,
+          notes: specialRequests,
+        };
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const mockBookingId = `book_${Date.now()}`;
-      success('Booking confirmed successfully!');
-      onBookingComplete(mockBookingId);
-      
-    } catch (err) {
-      error('Failed to create booking. Please try again.');
-    } finally {
-      setLoading(false);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        const mockBookingId = `book_${Date.now()}`;
+        success('Booking confirmed! Pay remaining amount at the turf.');
+        onBookingComplete(mockBookingId);
+      } catch (err) {
+        error('Failed to create booking. Please try again.');
+      } finally {
+        setLoading(false);
+      }
     }
+  };
+
+  const handlePaymentSuccess = (paymentDetails: any) => {
+    success('Payment completed successfully!');
+    const mockBookingId = `book_${Date.now()}`;
+    onBookingComplete(mockBookingId);
+  };
+
+  const handlePaymentFailure = (errorMessage: string) => {
+    error(`Payment failed: ${errorMessage}`);
+    setStep(2); // Go back to payment method selection
   };
 
   const formatPhoneNumber = (value: string) => {
@@ -256,6 +268,21 @@ const BookingForm = ({ turf, selectedSlot, selectedDate, onBookingComplete, onCa
                     <div className="font-semibold">₹{totalAmount}</div>
                   </div>
                 </div>
+                <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-muted/50">
+                  <RadioGroupItem value="cash" id="cash" />
+                  <Label htmlFor="cash" className="flex-1 cursor-pointer">
+                    <div>
+                      <div className="font-medium">Pay at Turf</div>
+                      <div className="text-sm text-muted-foreground">
+                        Pay 50% advance online, rest at turf
+                      </div>
+                    </div>
+                  </Label>
+                  <div className="text-right">
+                    <div className="font-semibold">₹{advanceAmount}</div>
+                    <div className="text-xs text-muted-foreground">advance</div>
+                  </div>
+                </div>
               </RadioGroup>
             </CardContent>
           </Card>
@@ -302,6 +329,25 @@ const BookingForm = ({ turf, selectedSlot, selectedDate, onBookingComplete, onCa
               </div>
             </CardContent>
           </Card>
+        </motion.div>
+      )}
+
+      {/* Step 3: Payment Gateway */}
+      {step === 3 && (
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <PaymentGateway
+            amount={paymentMethod === 'cash' ? advanceAmount : totalAmount}
+            currency="INR"
+            bookingId={`temp_${Date.now()}`}
+            customerDetails={customerDetails}
+            onPaymentSuccess={handlePaymentSuccess}
+            onPaymentFailure={handlePaymentFailure}
+            onCancel={() => setStep(2)}
+          />
         </motion.div>
       )}
     </div>
