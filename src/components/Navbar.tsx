@@ -1,7 +1,7 @@
 // Enhanced Navbar Component - Phase 5 Authentication Integration
 // **BACKEND INTEGRATION**: Connected to Supabase authentication system
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Menu, X, User, LogOut, Settings, MapPin, Calendar, Building, Search, Bell } from 'lucide-react';
@@ -16,6 +16,7 @@ import NotificationCenter from '@/components/notifications/NotificationCenter';
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout, isOwner, isCustomer, isAdmin } = useAuth();
@@ -130,12 +131,14 @@ const Navbar = () => {
                   className="relative"
                 >
                   <Bell className="h-5 w-5" />
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
-                  >
-                    3
-                  </Badge>
+                  {unreadCount > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
+                    >
+                      {unreadCount}
+                    </Badge>
+                  )}
                 </Button>
 
                 {/* User Menu */}
@@ -330,6 +333,7 @@ const Navbar = () => {
       <NotificationCenter
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
+        onUnreadCountChange={setUnreadCount}
       />
     </motion.nav>
   );

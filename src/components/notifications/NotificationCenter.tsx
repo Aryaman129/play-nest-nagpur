@@ -33,9 +33,10 @@ interface Notification {
 interface NotificationCenterProps {
   isOpen: boolean;
   onClose: () => void;
+  onUnreadCountChange?: (count: number) => void;
 }
 
-const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps) => {
+const NotificationCenter = ({ isOpen, onClose, onUnreadCountChange }: NotificationCenterProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
 
@@ -95,6 +96,12 @@ const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps) => {
     ];
     setNotifications(mockNotifications);
   }, []);
+
+  // Update parent component with unread count
+  useEffect(() => {
+    const unreadCount = notifications.filter(n => !n.isRead).length;
+    onUnreadCountChange?.(unreadCount);
+  }, [notifications, onUnreadCountChange]);
 
   const getNotificationIcon = (type: Notification['type']) => {
     const iconMap = {
