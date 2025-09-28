@@ -327,45 +327,101 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-foreground text-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <MdSportsSoccer className="text-2xl text-primary" />
-                <span className="text-xl font-bold">PlayNest</span>
+      <footer className="bg-gradient-to-br from-foreground via-foreground to-foreground/95 text-white py-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-12 lg:gap-16">
+            {/* Brand Section */}
+            <div className="lg:col-span-2">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-primary/20 rounded-xl">
+                  <MdSportsSoccer className="text-3xl text-primary" />
+                </div>
+                <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  PlayNest
+                </span>
               </div>
-              <p className="text-white/70 mb-4">Your trusted partner for sports venue bookings.</p>
+              <p className="text-lg text-white/80 mb-6 max-w-md leading-relaxed">
+                Your trusted partner for sports venue bookings. Connect with the best sports facilities and book your perfect game time.
+              </p>
               <div className="flex gap-4">
-                {/* Social media icons would go here */}
+                {/* Social media icons placeholder */}
+                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
+                  <span className="text-sm">FB</span>
+                </div>
+                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
+                  <span className="text-sm">TW</span>
+                </div>
+                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
+                  <span className="text-sm">IG</span>
+                </div>
               </div>
             </div>
             
+            {/* For Players Section */}
             <div>
-              <h4 className="font-semibold mb-4">For Players</h4>
-              <ul className="space-y-2 text-white/70">
-                <li><a href="#" className="hover:text-white transition-colors">Find Turfs</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Book Online</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">My Bookings</a></li>
-                
+              <h4 className="text-lg font-semibold mb-6 text-white">For Players</h4>
+              <ul className="space-y-4">
+                <li>
+                  <a href="#" className="text-white/70 hover:text-primary transition-colors duration-200 flex items-center group">
+                    <span className="w-1 h-1 bg-primary rounded-full mr-3 group-hover:w-2 transition-all duration-200"></span>
+                    Find Turfs
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-white/70 hover:text-primary transition-colors duration-200 flex items-center group">
+                    <span className="w-1 h-1 bg-primary rounded-full mr-3 group-hover:w-2 transition-all duration-200"></span>
+                    Book Online
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-white/70 hover:text-primary transition-colors duration-200 flex items-center group">
+                    <span className="w-1 h-1 bg-primary rounded-full mr-3 group-hover:w-2 transition-all duration-200"></span>
+                    My Bookings
+                  </a>
+                </li>
               </ul>
             </div>
             
-            
-            
+            {/* Company Section */}
             <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-white/70">
-                <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-                
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+              <h4 className="text-lg font-semibold mb-6 text-white">Company</h4>
+              <ul className="space-y-4">
+                <li>
+                  <a href="#" className="text-white/70 hover:text-primary transition-colors duration-200 flex items-center group">
+                    <span className="w-1 h-1 bg-primary rounded-full mr-3 group-hover:w-2 transition-all duration-200"></span>
+                    About Us
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-white/70 hover:text-primary transition-colors duration-200 flex items-center group">
+                    <span className="w-1 h-1 bg-primary rounded-full mr-3 group-hover:w-2 transition-all duration-200"></span>
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-white/70 hover:text-primary transition-colors duration-200 flex items-center group">
+                    <span className="w-1 h-1 bg-primary rounded-full mr-3 group-hover:w-2 transition-all duration-200"></span>
+                    Terms of Service
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/70">
-            <p>© 2024 PlayNest. All rights reserved. Made for sports lovers.</p>
+          {/* Bottom Section */}
+          <div className="border-t border-white/20 mt-16 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-white/60 text-center md:text-left">
+                © 2024 PlayNest. All rights reserved. Made for sports lovers.
+              </p>
+              <div className="flex items-center gap-6 text-sm text-white/60">
+                <a href="#" className="hover:text-white transition-colors">Contact</a>
+                <span>•</span>
+                <a href="#" className="hover:text-white transition-colors">Support</a>
+                <span>•</span>
+                <a href="#" className="hover:text-white transition-colors">Help</a>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
