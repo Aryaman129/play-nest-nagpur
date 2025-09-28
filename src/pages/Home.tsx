@@ -367,9 +367,7 @@ const Home = () => {
           </div>
           
           <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/70">
-            <p>© 2024 PlayNest. All rights reserved. Made for sports lovers.
-
-          </p>
+            <p>&copy; 2024 PlayNest. All rights reserved. Made with ❤️ for sports lovers in Nagpur.</p>
           </div>
         </div>
       </footer>
