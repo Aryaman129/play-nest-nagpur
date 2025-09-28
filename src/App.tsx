@@ -1,9 +1,12 @@
+// Main App Component - Enhanced with Phase 5 Authentication
+// **BACKEND INTEGRATION**: Connected to Supabase authentication system
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 
-// Test with simplified auth provider to isolate React issues
-import { AuthProvider } from '@/contexts/SimpleAuthContext';
+// Authentication Provider
+import { AuthProvider, ProtectedRoute } from '@/contexts/EnhancedAuthContext';
 import { BookingProvider } from '@/contexts/BookingContext';
 
 // Import pages
@@ -20,6 +23,10 @@ import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import TermsOfService from '@/pages/TermsOfService';
 import NotFound from '@/pages/NotFound';
 
+// Authentication pages
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
+
 import './App.css';
 
 function App() {
@@ -29,17 +36,44 @@ function App() {
         <Router>
           <div className="App">
             <Routes>
+              {/* Public Routes */}
               <Route path="/" element={<Home />} />
               <Route path="/turfs" element={<TurfList />} />
               <Route path="/turf/:id" element={<TurfDetail />} />
-              <Route path="/booking/:turfId" element={<Booking />} />
-              <Route path="/bookings" element={<Bookings />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/owner-dashboard" element={<OwnerDashboard />} />
               <Route path="/about" element={<AboutUs />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
+              
+              {/* Authentication Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              
+              {/* Protected Routes - Require Authentication */}
+              <Route path="/booking/:turfId" element={
+                <ProtectedRoute>
+                  <Booking />
+                </ProtectedRoute>
+              } />
+              <Route path="/bookings" element={
+                <ProtectedRoute>
+                  <Bookings />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } />
+              
+              {/* Owner-Only Routes */}
+              <Route path="/owner-dashboard" element={
+                <ProtectedRoute requiredRole="owner">
+                  <OwnerDashboard />
+                </ProtectedRoute>
+              } />
+              
+              {/* Catch all route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />
