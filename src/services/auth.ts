@@ -2,10 +2,13 @@ import { User, AuthState, ApiResponse } from '@/types';
 import { apiClient } from './api';
 import { MOCK_USERS } from '@/utils/mockData';
 
+// Authentication service using Singleton pattern for global state management
+// Backend Integration: Replace mock logic with actual API calls to your auth endpoints
 export class AuthService {
   private static instance: AuthService;
-  private currentUser: User | null = null;
+  private currentUser: User | null = null;  // In-memory user cache
 
+  // Singleton pattern ensures single auth state across the app
   static getInstance(): AuthService {
     if (!AuthService.instance) {
       AuthService.instance = new AuthService();
@@ -14,32 +17,38 @@ export class AuthService {
   }
 
   /**
-   * Mock sign in
+   * Sign in user with email and password
+   * Backend: POST /auth/signin with email/password validation
+   * Should return JWT token and user data
    */
   async signIn(email: string, password: string): Promise<ApiResponse<{ user: User; token: string }>> {
     try {
+      // Backend call: Send credentials to your authentication endpoint
       await apiClient.post('/auth/signin', { email, password });
       
-      // Mock authentication logic
+      // Mock authentication logic - REPLACE WITH REAL BACKEND RESPONSE
       const user = MOCK_USERS.find(u => u.email === email);
       
       if (!user) {
         throw new Error('Invalid credentials');
       }
       
+      // Store user data and token for session management
       this.currentUser = user;
-      localStorage.setItem('auth_token', 'mock_token_' + user.id);
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('auth_token', 'mock_token_' + user.id);  // Store JWT token
+      localStorage.setItem('user', JSON.stringify(user));          // Cache user data
       
+      // Backend should return user object and JWT token
       return {
         data: {
           user,
-          token: 'mock_token_' + user.id,
+          token: 'mock_token_' + user.id,  // Replace with actual JWT from backend
         },
         success: true,
         timestamp: new Date(),
       };
     } catch (error) {
+      // Handle authentication failures
       throw {
         code: 'AUTH_FAILED',
         message: 'Invalid email or password',
@@ -49,7 +58,8 @@ export class AuthService {
   }
 
   /**
-   * Mock sign up
+   * Register new user account
+   * Backend: POST /auth/signup with user data validation and account creation
    */
   async signUp(userData: {
     name: string;

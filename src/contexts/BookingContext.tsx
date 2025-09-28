@@ -1,18 +1,20 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Turf, TimeSlot, Booking } from '@/types';
 
+// Booking flow state management for multi-step booking process
+// Tracks user progress through: slot selection → details → payment → confirmation
 interface BookingState {
-  selectedTurf: Turf | null;
-  selectedSlot: TimeSlot | null;
-  selectedDate: Date | null;
-  customerDetails: {
+  selectedTurf: Turf | null;        // Currently selected turf for booking
+  selectedSlot: TimeSlot | null;    // Selected time slot
+  selectedDate: Date | null;        // Selected booking date
+  customerDetails: {                // Customer information for booking
     name: string;
     email: string;
     phone: string;
   } | null;
-  totalPrice: number;
-  currentStep: 'slot' | 'details' | 'payment' | 'confirmation';
-  bookingId: string | null;
+  totalPrice: number;               // Calculated total price with taxes
+  currentStep: 'slot' | 'details' | 'payment' | 'confirmation'; // Current booking step
+  bookingId: string | null;         // Created booking ID after successful creation
 }
 
 interface BookingContextType extends BookingState {

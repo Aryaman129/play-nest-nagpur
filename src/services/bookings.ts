@@ -2,37 +2,44 @@ import { Booking, BookingRequest, Review, Waitlist, ApiResponse, PaginatedRespon
 import { apiClient } from './api';
 import { MOCK_BOOKINGS, MOCK_REVIEWS } from '@/utils/mockData';
 
+// Booking management service for all booking-related operations
+// Backend Integration: Connect to bookings, reviews, and waitlist tables
 export class BookingService {
   /**
-   * Create a new booking
+   * Create a new booking record
+   * Backend: POST /bookings - Insert into bookings table with availability check
+   * Should validate slot availability and prevent double booking
    */
   async createBooking(bookingData: BookingRequest): Promise<ApiResponse<Booking>> {
     try {
+      // Backend: Create booking record with slot availability validation
       await apiClient.post('/bookings', bookingData);
       
+      // Mock booking creation - REPLACE WITH BACKEND RESPONSE
       const newBooking: Booking = {
-        id: 'book_' + Date.now(),
-        customerId: bookingData.customerId,
-        turfId: bookingData.turfId,
-        slotStart: bookingData.slotStart,
-        slotEnd: bookingData.slotEnd,
-        price: this.calculatePrice(bookingData.slotStart, bookingData.slotEnd),
-        advancePaid: 0, // Will be updated after payment
-        status: 'pending',
-        receiptId: '',
-        paymentMethod: bookingData.paymentMethod,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        customerDetails: bookingData.customerDetails,
-        turfDetails: {
-          name: 'Mock Turf Name', // Will be populated from turf service
-          address: 'Mock Address',
-          sports: ['Football'],
+        id: 'book_' + Date.now(),                    // Backend generates UUID
+        customerId: bookingData.customerId,         // User making the booking
+        turfId: bookingData.turfId,                 // Target turf
+        slotStart: bookingData.slotStart,           // Booking start time
+        slotEnd: bookingData.slotEnd,               // Booking end time
+        price: this.calculatePrice(bookingData.slotStart, bookingData.slotEnd), // Dynamic pricing
+        advancePaid: 0,                             // Updated after payment processing
+        status: 'pending',                          // Initial status, changes after payment
+        receiptId: '',                              // Generated after payment
+        paymentMethod: bookingData.paymentMethod,   // Customer selected payment method
+        createdAt: new Date(),                      // Booking creation timestamp
+        updatedAt: new Date(),                      // Last update timestamp
+        customerDetails: bookingData.customerDetails, // Customer info for the booking
+        turfDetails: {                              // Populated from turf data
+          name: 'Mock Turf Name',                   // Fetch from turfs table
+          address: 'Mock Address',                  // Fetch from turfs table
+          sports: ['Football'],                     // Fetch from turfs table
         },
-        notes: bookingData.notes,
-        qrCode: `QR_${Date.now()}_verify`,
+        notes: bookingData.notes,                   // Optional customer notes
+        qrCode: `QR_${Date.now()}_verify`,          // Generate unique QR for check-in
       };
       
+      // Add to mock storage - BACKEND HANDLES THIS
       MOCK_BOOKINGS.push(newBooking);
       
       return {
@@ -41,6 +48,7 @@ export class BookingService {
         timestamp: new Date(),
       };
     } catch (error) {
+      // Handle booking creation failures
       throw {
         code: 'BOOKING_FAILED',
         message: 'Failed to create booking',

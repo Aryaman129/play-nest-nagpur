@@ -1,30 +1,36 @@
 import { PaymentDetails, ApiResponse } from '@/types';
 import { apiClient } from './api';
 
+// Payment processing service with Razorpay integration
+// Backend Integration: Connect to Razorpay API and payments table
 export class PaymentService {
   /**
-   * Initiate payment (mock Razorpay integration)
+   * Initialize payment order with Razorpay
+   * Backend: POST /payments/initiate - Create Razorpay order and store in payments table
+   * Returns order_id needed for Razorpay checkout
    */
   async initiatePayment(paymentData: {
-    amount: number;
-    currency: string;
-    bookingId: string;
-    customerEmail: string;
-    customerPhone: string;
+    amount: number;          // Payment amount in rupees
+    currency: string;        // Currency code (INR)
+    bookingId: string;      // Associated booking ID
+    customerEmail: string;   // Customer email for receipt
+    customerPhone: string;   // Customer phone for OTP
   }): Promise<ApiResponse<{ orderId: string; keyId: string }>> {
     try {
+      // Backend: Create Razorpay order and store payment record
       await apiClient.post('/payments/initiate', paymentData);
       
-      // Mock order creation
-      const orderId = `order_${Date.now()}`;
-      const keyId = 'rzp_test_mock_key'; // Mock Razorpay key
+      // Mock order creation - REPLACE WITH RAZORPAY API RESPONSE
+      const orderId = `order_${Date.now()}`;           // Razorpay generates actual order_id
+      const keyId = 'rzp_test_mock_key';               // Your Razorpay API key from dashboard
       
       return {
-        data: { orderId, keyId },
+        data: { orderId, keyId },                      // Frontend needs these for checkout
         success: true,
         timestamp: new Date(),
       };
     } catch (error) {
+      // Handle payment initiation failures
       throw {
         code: 'PAYMENT_INIT_FAILED',
         message: 'Failed to initiate payment',

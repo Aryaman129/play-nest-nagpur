@@ -2,23 +2,28 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User, AuthState } from '@/types';
 import { authService } from '@/services/auth';
 
+// Authentication context interface for React Context API
+// Provides authentication state and methods to all components
 interface AuthContextType extends AuthState {
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (userData: {
+  signIn: (email: string, password: string) => Promise<void>;  // Login function
+  signUp: (userData: {                                         // Registration function
     name: string;
     email: string;
     phone: string;
     password: string;
-    role?: 'customer' | 'owner';
+    role?: 'customer' | 'owner';                               // Optional role selection
   }) => Promise<void>;
-  signOut: () => Promise<void>;
-  checkRole: (role: 'customer' | 'owner' | 'admin') => boolean;
-  hasAnyRole: (roles: Array<'customer' | 'owner' | 'admin'>) => boolean;
-  setUser: (user: User | null) => void;
+  signOut: () => Promise<void>;                                // Logout function
+  checkRole: (role: 'customer' | 'owner' | 'admin') => boolean; // Role validation
+  hasAnyRole: (roles: Array<'customer' | 'owner' | 'admin'>) => boolean; // Multi-role check
+  setUser: (user: User | null) => void;                        // Manual user update
 }
 
+// Create React Context for authentication state
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Custom hook to access authentication context
+// Usage: const { user, signIn, signOut } = useAuth();
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -27,8 +32,9 @@ export const useAuth = () => {
   return context;
 };
 
+// Props interface for AuthProvider component
 interface AuthProviderProps {
-  children: ReactNode;
+  children: ReactNode;  // Child components that need access to auth state
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
