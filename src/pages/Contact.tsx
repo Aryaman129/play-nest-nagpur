@@ -28,35 +28,17 @@ const Contact = () => {
 
   const contactInfo = [
     {
-      icon: <FaPhone className="text-2xl text-primary" />,
-      title: "Phone Support",
-      info: "+91-XXX-XXX-XXXX",
-      subInfo: "Available 10 AM - 8 PM"
-    },
-    {
-      icon: <FaEnvelope className="text-2xl text-secondary" />,
-      title: "Email Us",
+      icon: <FaEnvelope className="text-2xl text-primary" />,
+      title: "Email Support",
       info: "support@playnest.in",
       subInfo: "We reply within 24 hours"
-    },
-    {
-      icon: <FaMapMarkerAlt className="text-2xl text-accent" />,
-      title: "Visit Us",
-      info: "Nagpur, Maharashtra",
-      subInfo: "India - 440001"
-    },
-    {
-      icon: <FaClock className="text-2xl text-primary" />,
-      title: "Business Hours",
-      info: "Monday - Sunday",
-      subInfo: "6 AM - 11 PM"
     }
   ];
 
   const faqItems = [
     {
       question: "How do I cancel my booking?",
-      answer: "You can cancel your booking through your profile page. Cancellations 24+ hours in advance receive full refund."
+      answer: "For cancellations and refunds, please contact the turf owner directly. Their contact details are provided in your booking confirmation."
     },
     {
       question: "What payment methods do you accept?",
@@ -64,11 +46,11 @@ const Contact = () => {
     },
     {
       question: "Can I modify my booking time?",
-      answer: "Yes, you can modify your booking if the new slot is available. Contact support for assistance."
+      answer: "Yes, you can modify your booking if the new slot is available. Contact the turf owner directly or reach out to our support team."
     },
     {
       question: "What if it rains on my booking day?",
-      answer: "If the turf owner cancels due to weather, you'll receive a full refund. You can also reschedule for free."
+      answer: "Weather-related cancellations should be discussed directly with the turf owner. Each turf may have different policies for weather conditions."
     }
   ];
 
@@ -96,7 +78,7 @@ const Contact = () => {
       {/* Contact Info */}
       <div className="py-16">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+          <div className="flex justify-center mb-16">
             {contactInfo.map((item, index) => (
               <motion.div
                 key={item.title}
@@ -105,13 +87,13 @@ const Contact = () => {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
                 whileHover={{ y: -5 }}
-                className="bg-white rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-all"
+                className="bg-white rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all max-w-md"
               >
                 <div className="flex justify-center mb-4">
                   {item.icon}
                 </div>
-                <h3 className="text-lg font-bold mb-2">{item.title}</h3>
-                <p className="text-foreground font-medium">{item.info}</p>
+                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                <p className="text-foreground font-medium text-lg">{item.info}</p>
                 <p className="text-sm text-muted-foreground">{item.subInfo}</p>
               </motion.div>
             ))}
@@ -251,16 +233,16 @@ const Contact = () => {
               >
                 <h3 className="text-xl font-bold mb-3">Need Immediate Help?</h3>
                 <p className="text-muted-foreground mb-4">
-                  For urgent booking issues or emergencies, call our support line directly.
+                  For urgent booking issues, please email us and we'll respond as quickly as possible.
                 </p>
                 <motion.a
-                  href="tel:+91XXXXXXXXXX"
+                  href="mailto:support@playnest.in"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="btn-outline inline-flex items-center gap-2"
                 >
-                  <FaPhone />
-                  Call Support
+                  <FaEnvelope />
+                  Email Support
                 </motion.a>
               </motion.div>
             </motion.div>

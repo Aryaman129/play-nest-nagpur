@@ -7,6 +7,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const menuItems = [
+    { label: 'Home', href: '/' },
     { label: 'Find Turfs', href: '/turfs' },
     { label: 'My Booking', href: '/bookings' },
     { label: 'About', href: '/about' },

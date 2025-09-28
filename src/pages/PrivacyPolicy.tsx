@@ -82,7 +82,7 @@ const PrivacyPolicy = () => {
           >
             <h2 className="text-3xl font-bold mb-6">Welcome to PlayNest</h2>
             <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-              At PlayNest, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our platform to book sports turfs in Nagpur.
+              At PlayNest, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our platform to book sports turfs.
             </p>
             <p className="text-lg text-muted-foreground leading-relaxed">
               By using PlayNest, you agree to the collection and use of information in accordance with this policy. We will never sell your personal data to third parties.
@@ -169,7 +169,7 @@ const PrivacyPolicy = () => {
             </p>
             <div className="bg-muted/20 rounded-lg p-4">
               <p className="text-sm"><strong>Email:</strong> privacy@playnest.in</p>
-              <p className="text-sm"><strong>Address:</strong> PlayNest Privacy Team, Nagpur, Maharashtra, India</p>
+              <p className="text-sm"><strong>Response Time:</strong> We typically respond within 48 hours</p>
             </div>
           </motion.div>
         </div>

@@ -8,7 +8,7 @@ const AboutUs = () => {
     {
       icon: <FaBullseye className="text-4xl text-primary" />,
       title: "Our Mission",
-      description: "To make sports accessible to everyone in Nagpur by connecting players with quality turf facilities."
+      description: "To make sports accessible to everyone by connecting players with quality turf facilities."
     },
     {
       icon: <FaUsers className="text-4xl text-secondary" />,
@@ -22,8 +22,8 @@ const AboutUs = () => {
     },
     {
       icon: <FaMapMarkerAlt className="text-4xl text-primary" />,
-      title: "Local Focus",
-      description: "Proudly serving Nagpur with deep understanding of local sports culture and needs."
+      title: "Growth Focus",
+      description: "Expanding to serve more cities with deep understanding of local sports culture and needs."
     }
   ];
 
@@ -46,7 +46,7 @@ const AboutUs = () => {
               About PlayNest
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Your trusted partner for sports turf bookings in Nagpur. We're passionate about bringing the sports community together through seamless booking experiences.
+              Your trusted partner for sports turf bookings. We're passionate about bringing the sports community together through seamless booking experiences.
             </p>
           </motion.div>
         </div>
@@ -65,10 +65,10 @@ const AboutUs = () => {
             <h2 className="text-4xl font-bold mb-8">Our Story</h2>
             <div className="bg-white rounded-2xl p-8 shadow-lg">
               <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                PlayNest was born from a simple observation: finding and booking quality sports turfs in Nagpur was unnecessarily complicated. As sports enthusiasts ourselves, we experienced the frustration of calling multiple venues, dealing with unclear pricing, and missing out on our favorite playing times.
+                PlayNest was born from a simple observation: finding and booking quality sports turfs was unnecessarily complicated. As sports enthusiasts ourselves, we experienced the frustration of calling multiple venues, dealing with unclear pricing, and missing out on our favorite playing times.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                We envisioned a platform that would make sports more accessible to everyone - from weekend warriors to professional athletes, from small turf owners to large sports complexes. Today, PlayNest connects thousands of players with premium sports facilities across Nagpur.
+                We envisioned a platform that would make sports more accessible to everyone - from weekend warriors to professional athletes, from small turf owners to large sports complexes. Today, PlayNest connects thousands of players with premium sports facilities.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Our journey is just beginning, and we're committed to continuously improving the sports experience for our community.
@@ -127,13 +127,13 @@ const AboutUs = () => {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl font-bold mb-8">Built for Nagpur, by Nagpur</h2>
+            <h2 className="text-4xl font-bold mb-8">Built by Sports Enthusiasts</h2>
             <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-8">
               <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                We're a team of local sports enthusiasts, tech innovators, and community builders who understand the unique needs of Nagpur's sports scene. From the cricket grounds of Jamtha to the football fields of Dharampeth, we know every corner of our city's sporting landscape.
+                We're a team of sports enthusiasts, tech innovators, and community builders who understand the unique needs of the sports scene. We know the challenges players face when trying to find quality turfs.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Our local expertise combined with cutting-edge technology ensures that PlayNest serves the Nagpur sports community exactly as it deserves - with passion, precision, and pride.
+                Our expertise combined with cutting-edge technology ensures that PlayNest serves the sports community exactly as it deserves - with passion, precision, and pride.
               </p>
             </div>
           </motion.div>

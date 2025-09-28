@@ -19,8 +19,8 @@ const TermsOfService = () => {
       title: "Booking Terms",
       content: [
         "Bookings require 50% advance payment to confirm your slot",
-        "Cancellations made 24+ hours in advance receive full refund",
-        "No-shows or late cancellations may forfeit the advance payment",
+        "For cancellations and refunds, contact the turf owner directly",
+        "Each turf may have different cancellation policies",
         "Turf owners reserve the right to cancel due to weather or maintenance"
       ]
     },
@@ -85,7 +85,7 @@ const TermsOfService = () => {
               Welcome to PlayNest! These Terms of Service ("Terms") govern your use of our sports turf booking platform. By accessing or using PlayNest, you agree to be bound by these Terms and our Privacy Policy.
             </p>
             <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-              PlayNest connects sports enthusiasts with quality turf facilities across Nagpur. We strive to provide a seamless booking experience while maintaining fair policies for all users.
+              PlayNest connects sports enthusiasts with quality turf facilities. We strive to provide a seamless booking experience while maintaining fair policies for all users.
             </p>
             <div className="bg-accent/10 border-l-4 border-accent p-4 rounded-r-lg">
               <p className="text-sm font-medium">
@@ -137,17 +137,11 @@ const TermsOfService = () => {
             viewport={{ once: true }}
             className="bg-white rounded-2xl p-8 shadow-lg"
           >
-            <h3 className="text-2xl font-bold mb-4">Payment & Refund Policy</h3>
+            <h3 className="text-2xl font-bold mb-4">Payment Policy</h3>
             <div className="space-y-4 text-muted-foreground">
               <p><strong>Payment Terms:</strong> All bookings require 50% advance payment to secure your slot. The remaining 50% is payable at the turf before your game.</p>
-              <p><strong>Refund Policy:</strong></p>
-              <ul className="ml-6 space-y-1">
-                <li>• Cancellations 24+ hours in advance: 100% refund</li>
-                <li>• Cancellations 12-24 hours in advance: 50% refund</li>
-                <li>• Cancellations less than 12 hours: No refund</li>
-                <li>• Weather-related cancellations by turf: Full refund</li>
-              </ul>
-              <p><strong>Processing:</strong> Refunds are processed within 5-7 business days to your original payment method.</p>
+              <p><strong>Cancellations & Refunds:</strong> For any cancellation requests or refund inquiries, please contact the turf owner directly. Each turf facility maintains its own cancellation and refund policies.</p>
+              <p><strong>Contact Information:</strong> Turf owner contact details are provided in your booking confirmation email and are available in your booking history.</p>
             </div>
           </motion.div>
 
@@ -217,8 +211,7 @@ const TermsOfService = () => {
             </p>
             <div className="bg-muted/20 rounded-lg p-4 space-y-2">
               <p className="text-sm"><strong>Email:</strong> support@playnest.in</p>
-              <p className="text-sm"><strong>Phone:</strong> +91-XXX-XXX-XXXX (10 AM - 8 PM)</p>
-              <p className="text-sm"><strong>Address:</strong> PlayNest Support, Nagpur, Maharashtra, India</p>
+              <p className="text-sm"><strong>Response Time:</strong> We typically respond within 24 hours</p>
             </div>
           </motion.div>
         </div>
