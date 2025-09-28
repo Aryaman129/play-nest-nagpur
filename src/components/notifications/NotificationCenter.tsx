@@ -238,7 +238,7 @@ const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps) => {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.1 }}
                           className={`p-4 hover:bg-muted cursor-pointer relative border-b ${
-                            !notification.isRead ? 'bg-primary/20 border-l-4 border-l-primary' : 'bg-background'
+                            !notification.isRead ? 'bg-blue-100 dark:bg-blue-900 border-l-4 border-l-primary' : 'bg-white dark:bg-gray-800'
                           }`}
                           onClick={() => {
                             markAsRead(notification.id);
