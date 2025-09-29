@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 
 // Authentication Provider
-import OfflinePage from '@/pages/OfflinePage';
+import { AuthProvider, ProtectedRoute } from '@/contexts/SimpleAuthContext';
 import { BookingProvider } from '@/contexts/BookingContext';
 
 // Import pages
@@ -23,6 +23,7 @@ import Contact from '@/pages/Contact';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import TermsOfService from '@/pages/TermsOfService';
 import NotFound from '@/pages/NotFound';
+import OfflinePage from '@/pages/OfflinePage';
 
 // Authentication pages
 import Login from '@/pages/Login';
@@ -56,11 +57,8 @@ function App() {
                   <Booking />
                 </ProtectedRoute>
               } />
-              <Route path="/bookings" element={
-                <ProtectedRoute>
-                  <Bookings />
-                </ProtectedRoute>
-              } />
+              <Route path="/bookings" element={<Bookings />} />
+              <Route path="/offline" element={<OfflinePage />} />
               <Route path="/profile" element={
                 <ProtectedRoute>
                   <Profile />

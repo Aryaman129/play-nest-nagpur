@@ -13,7 +13,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useAuth, RegisterData } from '@/contexts/EnhancedAuthContext';
+import { useAuth, RegisterData } from '@/contexts/SimpleAuthContext';
 
 const Register = () => {
   const navigate = useNavigate();
