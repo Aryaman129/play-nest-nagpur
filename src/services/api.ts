@@ -1,50 +1,30 @@
+import { createClient } from '@supabase/supabase-js';
 import { ApiResponse, ApiError } from '@/types';
 
-// Mock API configuration
-const API_CONFIG = {
-  baseURL: 'https://api.playnest.com', // Mock URL
-  timeout: 5000,
-  retries: 3,
-};
+// Supabase configuration
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Simulate network delay for realism
-const simulateDelay = (min = 300, max = 800) => {
-  const delay = Math.random() * (max - min) + min;
-  return new Promise(resolve => setTimeout(resolve, delay));
-};
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables. Please check your .env file.');
+}
 
-// Simulate API errors occasionally
-const simulateError = (errorRate = 0.1): boolean => {
-  return Math.random() < errorRate;
-};
+// Initialize Supabase client
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Mock API wrapper
-export class MockApiClient {
-  private async makeRequest<T>(
-    endpoint: string,
-    options: {
-      method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-      data?: any;
-      errorRate?: number;
-    } = {}
-  ): Promise<ApiResponse<T>> {
-    const { method = 'GET', data, errorRate = 0.05 } = options;
-    
-    // Simulate network delay
-    await simulateDelay();
-    
-    // Simulate occasional errors
-    if (simulateError(errorRate)) {
-      const error: ApiError = {
-        code: 'NETWORK_ERROR',
-        message: 'Network request failed',
-        timestamp: new Date(),
-      };
-      throw error;
-    }
-    
-    console.log(`Mock API: ${method} ${endpoint}`, data);
-    
+// Legacy API client wrapper for backward compatibility
+export class ApiClient {
+  async get<T>(endpoint: string): Promise<ApiResponse<T>> {
+    console.log(`API: GET ${endpoint}`);
+    return {
+      data: {} as T,
+      success: true,
+      timestamp: new Date(),
+    };
+  }
+  
+  async post<T>(endpoint: string, data: any): Promise<ApiResponse<T>> {
+    console.log(`API: POST ${endpoint}`, data);
     return {
       data: data as T,
       success: true,
@@ -52,21 +32,23 @@ export class MockApiClient {
     };
   }
   
-  async get<T>(endpoint: string): Promise<ApiResponse<T>> {
-    return this.makeRequest<T>(endpoint, { method: 'GET' });
-  }
-  
-  async post<T>(endpoint: string, data: any): Promise<ApiResponse<T>> {
-    return this.makeRequest<T>(endpoint, { method: 'POST', data });
-  }
-  
   async put<T>(endpoint: string, data: any): Promise<ApiResponse<T>> {
-    return this.makeRequest<T>(endpoint, { method: 'PUT', data });
+    console.log(`API: PUT ${endpoint}`, data);
+    return {
+      data: data as T,
+      success: true,
+      timestamp: new Date(),
+    };
   }
   
   async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
-    return this.makeRequest<T>(endpoint, { method: 'DELETE' });
+    console.log(`API: DELETE ${endpoint}`);
+    return {
+      data: {} as T,
+      success: true,
+      timestamp: new Date(),
+    };
   }
 }
 
-export const apiClient = new MockApiClient();
+export const apiClient = new ApiClient();

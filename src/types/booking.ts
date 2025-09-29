@@ -71,6 +71,12 @@ export interface Review {
   verified: boolean;
 }
 
+export interface ReviewRequest {
+  bookingId: string;
+  rating: number;
+  comment?: string;
+}
+
 export interface Waitlist {
   id: string;
   customerId: string;

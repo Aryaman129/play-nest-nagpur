@@ -1,7 +1,5 @@
 import { Turf, TurfFilters, TimeSlot, ApiResponse, PaginatedResponse } from '@/types';
-import { apiClient } from './api';
-import { MOCK_TURFS, generateMockTimeSlots } from '@/utils/mockData';
-import { getTurfsWithinRadius } from '@/utils/calculateDistance';
+import { supabase } from './api';
 
 export class TurfService {
   /**
@@ -9,55 +7,54 @@ export class TurfService {
    */
   async getTurfs(filters?: Partial<TurfFilters>): Promise<PaginatedResponse<Turf>> {
     try {
-      await apiClient.get('/turfs');
-      
-      let filteredTurfs = [...MOCK_TURFS];
+      let query = supabase
+        .from('turfs')
+        .select('*')
+        .eq('verified', true)
+        .order('rating', { ascending: false });
       
       // Apply filters
       if (filters) {
         if (filters.sports?.length) {
-          filteredTurfs = filteredTurfs.filter(turf =>
-            turf.sports.some(sport => filters.sports?.includes(sport))
-          );
+          query = query.overlaps('sports', filters.sports);
         }
         
         if (filters.priceRange) {
-          filteredTurfs = filteredTurfs.filter(turf =>
-            turf.basePrice >= filters.priceRange!.min &&
-            turf.basePrice <= filters.priceRange!.max
-          );
+          query = query
+            .gte('base_price', filters.priceRange.min)
+            .lte('base_price', filters.priceRange.max);
         }
         
         if (filters.rating) {
-          filteredTurfs = filteredTurfs.filter(turf => turf.rating >= filters.rating!);
+          query = query.gte('rating', filters.rating);
         }
         
-        if (filters.amenities?.length) {
-          filteredTurfs = filteredTurfs.filter(turf =>
-            filters.amenities?.some(amenityId =>
-              turf.amenities.some(amenity => amenity.id === amenityId)
-            )
-          );
+        if (filters.location) {
+          query = query.ilike('location->>city', `%${filters.location}%`);
         }
       }
       
+      const { data, error } = await query;
+      
+      if (error) throw new Error(error.message);
+      
       return {
-        data: filteredTurfs,
+        data: data as Turf[],
         success: true,
         timestamp: new Date(),
         pagination: {
           page: 1,
           limit: 10,
-          total: filteredTurfs.length,
-          totalPages: Math.ceil(filteredTurfs.length / 10),
+          total: data?.length || 0,
+          totalPages: Math.ceil((data?.length || 0) / 10),
           hasNext: false,
           hasPrev: false,
         },
       };
-    } catch (error) {
+    } catch (error: any) {
       throw {
         code: 'FETCH_FAILED',
-        message: 'Failed to fetch turfs',
+        message: error.message || 'Failed to fetch turfs',
         timestamp: new Date(),
       };
     }
@@ -68,30 +65,31 @@ export class TurfService {
    */
   async getTurfById(id: string): Promise<ApiResponse<Turf>> {
     try {
-      await apiClient.get(`/turfs/${id}`);
+      const { data, error } = await supabase
+        .from('turfs')
+        .select('*')
+        .eq('id', id)
+        .single();
       
-      const turf = MOCK_TURFS.find(t => t.id === id);
-      
-      if (!turf) {
-        throw new Error('Turf not found');
-      }
+      if (error) throw new Error(error.message);
+      if (!data) throw new Error('Turf not found');
       
       return {
-        data: turf,
+        data: data as Turf,
         success: true,
         timestamp: new Date(),
       };
-    } catch (error) {
+    } catch (error: any) {
       throw {
         code: 'TURF_NOT_FOUND',
-        message: 'Turf not found',
+        message: error.message || 'Turf not found',
         timestamp: new Date(),
       };
     }
   }
 
   /**
-   * Get nearby turfs
+   * Get nearby turfs using PostGIS (if enabled) or simple filtering
    */
   async getNearbyTurfs(
     lat: number,
@@ -99,19 +97,36 @@ export class TurfService {
     radiusKm: number = 10
   ): Promise<ApiResponse<Array<Turf & { distance: number }>>> {
     try {
-      await apiClient.get(`/turfs/nearby?lat=${lat}&lng=${lng}&radius=${radiusKm}`);
+      // For now, we'll get all turfs and calculate distance client-side
+      // In production, you'd want to use PostGIS for spatial queries
+      const { data, error } = await supabase
+        .from('turfs')
+        .select('*')
+        .eq('verified', true);
       
-      const nearbyTurfs = getTurfsWithinRadius(MOCK_TURFS, lat, lng, radiusKm);
+      if (error) throw new Error(error.message);
+      
+      const turfsWithDistance = data.map(turf => {
+        const turfLat = turf.location?.lat || 0;
+        const turfLng = turf.location?.lng || 0;
+        const distance = this.calculateDistance(lat, lng, turfLat, turfLng);
+        
+        return {
+          ...turf,
+          distance,
+        };
+      }).filter(turf => turf.distance <= radiusKm)
+        .sort((a, b) => a.distance - b.distance);
       
       return {
-        data: nearbyTurfs,
+        data: turfsWithDistance as Array<Turf & { distance: number }>,
         success: true,
         timestamp: new Date(),
       };
-    } catch (error) {
+    } catch (error: any) {
       throw {
-        code: 'FETCH_FAILED',
-        message: 'Failed to fetch nearby turfs',
+        code: 'NEARBY_FETCH_FAILED',
+        message: error.message || 'Failed to fetch nearby turfs',
         timestamp: new Date(),
       };
     }
@@ -122,145 +137,237 @@ export class TurfService {
    */
   async getTimeSlots(turfId: string, date: Date): Promise<ApiResponse<TimeSlot[]>> {
     try {
-      await apiClient.get(`/turfs/${turfId}/slots?date=${date.toISOString()}`);
+      // Get turf details for availability rules
+      const { data: turf, error: turfError } = await supabase
+        .from('turfs')
+        .select('availability')
+        .eq('id', turfId)
+        .single();
       
-      const turf = MOCK_TURFS.find(t => t.id === turfId);
-      if (!turf) {
-        throw new Error('Turf not found');
-      }
+      if (turfError) throw new Error(turfError.message);
       
-      const slots = generateMockTimeSlots(date);
+      // Get existing bookings for the date
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+      
+      const { data: bookings, error: bookingsError } = await supabase
+        .from('bookings')
+        .select('slot_start, slot_end')
+        .eq('turf_id', turfId)
+        .gte('slot_start', startOfDay.toISOString())
+        .lte('slot_end', endOfDay.toISOString())
+        .in('status', ['confirmed', 'pending']);
+      
+      if (bookingsError) throw new Error(bookingsError.message);
+      
+      // Generate time slots based on turf availability
+      const slots = this.generateTimeSlots(date, turf.availability, bookings || []);
       
       return {
         data: slots,
         success: true,
         timestamp: new Date(),
       };
-    } catch (error) {
+    } catch (error: any) {
       throw {
         code: 'FETCH_FAILED',
-        message: 'Failed to fetch time slots',
+        message: error.message || 'Failed to fetch time slots',
         timestamp: new Date(),
       };
     }
   }
 
   /**
-   * Search turfs by name or location
+   * Search turfs by name, location, or sports
    */
   async searchTurfs(query: string): Promise<ApiResponse<Turf[]>> {
     try {
-      await apiClient.get(`/turfs/search?q=${encodeURIComponent(query)}`);
+      const { data, error } = await supabase
+        .from('turfs')
+        .select('*')
+        .eq('verified', true)
+        .or(`name.ilike.%${query}%,location->>address.ilike.%${query}%,location->>city.ilike.%${query}%`)
+        .order('rating', { ascending: false });
       
-      const results = MOCK_TURFS.filter(turf =>
-        turf.name.toLowerCase().includes(query.toLowerCase()) ||
-        turf.location.address.toLowerCase().includes(query.toLowerCase()) ||
-        turf.location.city.toLowerCase().includes(query.toLowerCase()) ||
-        turf.sports.some(sport => sport.toLowerCase().includes(query.toLowerCase()))
-      );
+      if (error) throw new Error(error.message);
       
       return {
-        data: results,
+        data: data as Turf[],
         success: true,
         timestamp: new Date(),
       };
-    } catch (error) {
+    } catch (error: any) {
       throw {
         code: 'SEARCH_FAILED',
-        message: 'Search failed',
+        message: error.message || 'Search failed',
         timestamp: new Date(),
       };
     }
   }
 
   /**
-   * Get popular turfs
+   * Get popular turfs based on rating and reviews
    */
   async getPopularTurfs(): Promise<ApiResponse<Turf[]>> {
     try {
-      await apiClient.get('/turfs/popular');
+      const { data, error } = await supabase
+        .from('turfs')
+        .select('*')
+        .eq('verified', true)
+        .gte('rating', 4.0)
+        .gte('total_reviews', 5)
+        .order('rating', { ascending: false })
+        .order('total_reviews', { ascending: false })
+        .limit(6);
       
-      // Sort by rating and total reviews
-      const popular = [...MOCK_TURFS]
-        .sort((a, b) => (b.rating * b.totalReviews) - (a.rating * a.totalReviews))
-        .slice(0, 6);
+      if (error) throw new Error(error.message);
       
       return {
-        data: popular,
+        data: data as Turf[],
         success: true,
         timestamp: new Date(),
       };
-    } catch (error) {
+    } catch (error: any) {
       throw {
         code: 'FETCH_FAILED',
-        message: 'Failed to fetch popular turfs',
+        message: error.message || 'Failed to fetch popular turfs',
         timestamp: new Date(),
       };
     }
   }
 
   /**
-   * Admin: Create new turf
+   * Create new turf (for owners)
    */
   async createTurf(turfData: Omit<Turf, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Turf>> {
     try {
-      await apiClient.post('/admin/turfs', turfData);
+      const { data, error } = await supabase
+        .from('turfs')
+        .insert([turfData])
+        .select()
+        .single();
       
-      const newTurf: Turf = {
-        ...turfData,
-        id: 'turf_' + Date.now(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      
-      MOCK_TURFS.push(newTurf);
+      if (error) throw new Error(error.message);
       
       return {
-        data: newTurf,
+        data: data as Turf,
         success: true,
         timestamp: new Date(),
       };
-    } catch (error) {
+    } catch (error: any) {
       throw {
         code: 'CREATE_FAILED',
-        message: 'Failed to create turf',
+        message: error.message || 'Failed to create turf',
         timestamp: new Date(),
       };
     }
   }
 
   /**
-   * Owner/Admin: Update turf
+   * Update turf (for owners)
    */
   async updateTurf(id: string, updates: Partial<Turf>): Promise<ApiResponse<Turf>> {
     try {
-      await apiClient.put(`/turfs/${id}`, updates);
+      const { data, error } = await supabase
+        .from('turfs')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
       
-      const turfIndex = MOCK_TURFS.findIndex(t => t.id === id);
-      if (turfIndex === -1) {
-        throw new Error('Turf not found');
-      }
-      
-      const updatedTurf = {
-        ...MOCK_TURFS[turfIndex],
-        ...updates,
-        updatedAt: new Date(),
-      };
-      
-      MOCK_TURFS[turfIndex] = updatedTurf;
+      if (error) throw new Error(error.message);
       
       return {
-        data: updatedTurf,
+        data: data as Turf,
         success: true,
         timestamp: new Date(),
       };
-    } catch (error) {
+    } catch (error: any) {
       throw {
         code: 'UPDATE_FAILED',
-        message: 'Failed to update turf',
+        message: error.message || 'Failed to update turf',
         timestamp: new Date(),
       };
     }
+  }
+
+  /**
+   * Upload turf photo to storage
+   */
+  async uploadTurfPhoto(turfId: string, file: File): Promise<string> {
+    try {
+      const fileName = `${turfId}/${Date.now()}_${file.name}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('turf-photos')
+        .upload(fileName, file);
+      
+      if (uploadError) throw new Error(uploadError.message);
+      
+      const { data } = supabase.storage
+        .from('turf-photos')
+        .getPublicUrl(fileName);
+      
+      return data.publicUrl;
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to upload photo');
+    }
+  }
+
+  /**
+   * Calculate distance between two points using Haversine formula
+   */
+  private calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  /**
+   * Generate time slots based on turf availability and existing bookings
+   */
+  private generateTimeSlots(date: Date, availability: any, bookings: any[]): TimeSlot[] {
+    const slots: TimeSlot[] = [];
+    const openTime = availability?.openTime || '06:00';
+    const closeTime = availability?.closeTime || '22:00';
+    
+    const [openHour, openMinute] = openTime.split(':').map(Number);
+    const [closeHour, closeMinute] = closeTime.split(':').map(Number);
+    
+    for (let hour = openHour; hour < closeHour; hour++) {
+      const startTime = `${hour.toString().padStart(2, '0')}:00`;
+      const endTime = `${(hour + 1).toString().padStart(2, '0')}:00`;
+      
+      const slotStart = new Date(date);
+      slotStart.setHours(hour, 0, 0, 0);
+      const slotEnd = new Date(date);
+      slotEnd.setHours(hour + 1, 0, 0, 0);
+      
+      // Check if slot conflicts with existing bookings
+      const isBooked = bookings.some(booking => {
+        const bookingStart = new Date(booking.slot_start);
+        const bookingEnd = new Date(booking.slot_end);
+        return (slotStart < bookingEnd && slotEnd > bookingStart);
+      });
+      
+      slots.push({
+        id: `${date.toISOString().split('T')[0]}_${startTime}`,
+        startTime,
+        endTime,
+        isAvailable: !isBooked,
+        price: 1000, // Base price, could be dynamic
+        date,
+      });
+    }
+    
+    return slots;
   }
 }
 

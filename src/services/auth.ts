@@ -1,14 +1,11 @@
 import { User, AuthState, ApiResponse } from '@/types';
-import { apiClient } from './api';
-import { MOCK_USERS } from '@/utils/mockData';
+import { supabase } from './api';
 
-// Authentication service using Singleton pattern for global state management
-// Backend Integration: Replace mock logic with actual API calls to your auth endpoints
+// Authentication service using Supabase Auth
 export class AuthService {
   private static instance: AuthService;
-  private currentUser: User | null = null;  // In-memory user cache
+  private currentUser: User | null = null;
 
-  // Singleton pattern ensures single auth state across the app
   static getInstance(): AuthService {
     if (!AuthService.instance) {
       AuthService.instance = new AuthService();
@@ -18,40 +15,38 @@ export class AuthService {
 
   /**
    * Sign in user with email and password
-   * Backend: POST /auth/signin with email/password validation
-   * Should return JWT token and user data
    */
   async signIn(email: string, password: string): Promise<ApiResponse<{ user: User; token: string }>> {
     try {
-      // Backend call: Send credentials to your authentication endpoint
-      await apiClient.post('/auth/signin', { email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       
-      // Mock authentication logic - REPLACE WITH REAL BACKEND RESPONSE
-      const user = MOCK_USERS.find(u => u.email === email);
+      if (error) throw new Error(error.message);
       
-      if (!user) {
-        throw new Error('Invalid credentials');
+      // Get user data from our users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+      
+      if (userError || !userData) {
+        throw new Error('User profile not found');
       }
       
-      // Store user data and token for session management
-      this.currentUser = user;
-      localStorage.setItem('auth_token', 'mock_token_' + user.id);  // Store JWT token
-      localStorage.setItem('user', JSON.stringify(user));          // Cache user data
+      this.currentUser = userData as User;
       
-      // Backend should return user object and JWT token
       return {
         data: {
-          user,
-          token: 'mock_token_' + user.id,  // Replace with actual JWT from backend
+          user: this.currentUser,
+          token: data.session?.access_token || '',
         },
         success: true,
         timestamp: new Date(),
       };
-    } catch (error) {
-      // Handle authentication failures
+    } catch (error: any) {
       throw {
         code: 'AUTH_FAILED',
-        message: 'Invalid email or password',
+        message: error.message || 'Invalid email or password',
         timestamp: new Date(),
       };
     }
@@ -59,7 +54,6 @@ export class AuthService {
 
   /**
    * Register new user account
-   * Backend: POST /auth/signup with user data validation and account creation
    */
   async signUp(userData: {
     name: string;
@@ -69,37 +63,48 @@ export class AuthService {
     role?: 'customer' | 'owner';
   }): Promise<ApiResponse<{ user: User; token: string }>> {
     try {
-      await apiClient.post('/auth/signup', userData);
+      // Create auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: userData.email,
+        password: userData.password,
+      });
       
-      const newUser: User = {
-        id: 'user_' + Date.now(),
+      if (authError) throw new Error(authError.message);
+      
+      if (!authData.user) throw new Error('Failed to create user account');
+      
+      // Create user profile in our users table
+      const newUser = {
+        id: authData.user.id,
         email: userData.email,
         name: userData.name,
         phone: userData.phone,
         role: userData.role || 'customer',
         verified: false,
-        createdAt: new Date(),
       };
       
-      // Add to mock users (in real app, this would be server-side)
-      MOCK_USERS.push(newUser);
+      const { data: userProfile, error: profileError } = await supabase
+        .from('users')
+        .insert([newUser])
+        .select()
+        .single();
       
-      this.currentUser = newUser;
-      localStorage.setItem('auth_token', 'mock_token_' + newUser.id);
-      localStorage.setItem('user', JSON.stringify(newUser));
+      if (profileError) throw new Error(profileError.message);
+      
+      this.currentUser = userProfile as User;
       
       return {
         data: {
-          user: newUser,
-          token: 'mock_token_' + newUser.id,
+          user: this.currentUser,
+          token: authData.session?.access_token || '',
         },
         success: true,
         timestamp: new Date(),
       };
-    } catch (error) {
+    } catch (error: any) {
       throw {
         code: 'SIGNUP_FAILED',
-        message: 'Failed to create account',
+        message: error.message || 'Failed to create account',
         timestamp: new Date(),
       };
     }
@@ -109,87 +114,124 @@ export class AuthService {
    * Sign out user
    */
   async signOut(): Promise<void> {
+    await supabase.auth.signOut();
     this.currentUser = null;
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user');
   }
 
   /**
    * Get current user
    */
-  getCurrentUser(): User | null {
+  async getCurrentUser(): Promise<User | null> {
     if (this.currentUser) {
       return this.currentUser;
     }
     
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      this.currentUser = JSON.parse(savedUser);
-      return this.currentUser;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+    
+    const { data: userData } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+    
+    if (userData) {
+      this.currentUser = userData as User;
     }
     
-    return null;
+    return this.currentUser;
   }
 
   /**
    * Check if user is authenticated
    */
-  isAuthenticated(): boolean {
-    const token = localStorage.getItem('auth_token');
-    return !!token && !!this.getCurrentUser();
+  async isAuthenticated(): Promise<boolean> {
+    const { data: { user } } = await supabase.auth.getUser();
+    return !!user;
   }
 
   /**
    * Check user role
    */
-  hasRole(role: 'customer' | 'owner' | 'admin'): boolean {
-    const user = this.getCurrentUser();
+  async hasRole(role: 'customer' | 'owner' | 'admin'): Promise<boolean> {
+    const user = await this.getCurrentUser();
     return user?.role === role;
   }
 
   /**
-   * Mock forgot password
+   * Forgot password
    */
   async forgotPassword(email: string): Promise<ApiResponse<{ message: string }>> {
-    await apiClient.post('/auth/forgot-password', { email });
-    
-    return {
-      data: { message: 'Password reset link sent to your email' },
-      success: true,
-      timestamp: new Date(),
-    };
-  }
-
-  /**
-   * Mock reset password
-   */
-  async resetPassword(token: string, newPassword: string): Promise<ApiResponse<{ message: string }>> {
-    await apiClient.post('/auth/reset-password', { token, password: newPassword });
-    
-    return {
-      data: { message: 'Password reset successfully' },
-      success: true,
-      timestamp: new Date(),
-    };
-  }
-
-  /**
-   * Mock verify email
-   */
-  async verifyEmail(token: string): Promise<ApiResponse<{ user: User }>> {
-    await apiClient.post('/auth/verify-email', { token });
-    
-    const user = this.getCurrentUser();
-    if (user) {
-      user.verified = true;
-      localStorage.setItem('user', JSON.stringify(user));
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) throw new Error(error.message);
+      
+      return {
+        data: { message: 'Password reset link sent to your email' },
+        success: true,
+        timestamp: new Date(),
+      };
+    } catch (error: any) {
+      throw {
+        code: 'PASSWORD_RESET_FAILED',
+        message: error.message || 'Failed to send password reset email',
+        timestamp: new Date(),
+      };
     }
-    
-    return {
-      data: { user: user! },
-      success: true,
-      timestamp: new Date(),
-    };
+  }
+
+  /**
+   * Reset password
+   */
+  async resetPassword(newPassword: string): Promise<ApiResponse<{ message: string }>> {
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw new Error(error.message);
+      
+      return {
+        data: { message: 'Password reset successfully' },
+        success: true,
+        timestamp: new Date(),
+      };
+    } catch (error: any) {
+      throw {
+        code: 'PASSWORD_UPDATE_FAILED',
+        message: error.message || 'Failed to update password',
+        timestamp: new Date(),
+      };
+    }
+  }
+
+  /**
+   * Verify email
+   */
+  async verifyEmail(): Promise<ApiResponse<{ user: User }>> {
+    try {
+      const user = await this.getCurrentUser();
+      if (!user) throw new Error('User not found');
+      
+      const { error } = await supabase
+        .from('users')
+        .update({ verified: true })
+        .eq('id', user.id);
+      
+      if (error) throw new Error(error.message);
+      
+      user.verified = true;
+      this.currentUser = user;
+      
+      return {
+        data: { user },
+        success: true,
+        timestamp: new Date(),
+      };
+    } catch (error: any) {
+      throw {
+        code: 'EMAIL_VERIFICATION_FAILED',
+        message: error.message || 'Failed to verify email',
+        timestamp: new Date(),
+      };
+    }
   }
 }
 
