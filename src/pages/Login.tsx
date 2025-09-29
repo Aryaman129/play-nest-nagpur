@@ -75,14 +75,29 @@ const Login = () => {
   };
 
   // Demo login function for testing
-  const handleDemoLogin = async (role: 'customer' | 'owner') => {
+  const handleDemoLogin = async (role: 'customer' | 'owner' | 'admin') => {
     try {
       setIsSubmitting(true);
-      const demoEmail = role === 'owner' ? 'owner@demo.com' : 'customer@demo.com';
+      
+      // **DATABASE INTEGRATION CALL**
+      let demoEmail = 'customer@demo.com'; // default customer
+      if (role === 'owner') demoEmail = 'owner@turfs.com';
+      if (role === 'admin') demoEmail = 'admin@playnest.com';
+      
       await login(demoEmail, 'demo123');
-      navigate(role === 'owner' ? '/owner-dashboard' : '/', { replace: true });
+      
+      // Navigate based on role
+      if (role === 'admin') {
+        navigate('/admin-dashboard', { replace: true });
+      } else if (role === 'owner') {
+        navigate('/owner-dashboard', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
+      
     } catch (err) {
       console.error('Demo login failed:', err);
+      setFormErrors({ submit: 'Demo login failed' });
     } finally {
       setIsSubmitting(false);
     }
@@ -126,6 +141,16 @@ const Login = () => {
                   Demo Owner
                 </Button>
               </div>
+              
+              {/* Super Admin Login */}
+              <Button
+                variant="destructive"
+                onClick={() => handleDemoLogin('admin')}
+                disabled={isSubmitting}
+                className="w-full"
+              >
+                🛡️ Super Admin Dashboard
+              </Button>
             </div>
 
             <div className="relative">

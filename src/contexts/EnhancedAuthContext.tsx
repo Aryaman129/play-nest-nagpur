@@ -3,23 +3,10 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAppToast } from '@/components/common/Toast';
+import { User } from '../types/user';
+import { MOCK_USERS } from '../utils/mockData';
 
 // **DATABASE INTEGRATION TYPES**
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  phone?: string;
-  role: 'customer' | 'owner' | 'admin';
-  avatar?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  // Owner-specific fields
-  businessName?: string;
-  businessAddress?: string;
-  verified?: boolean;
-}
-
 export interface AuthState {
   user: User | null;
   loading: boolean;
@@ -114,14 +101,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // if (error) throw error;
       
       // Mock implementation for demo
+      // TODO: Replace with proper user lookup from database
+      // const { data: user } = await supabase.from('profiles').select('*').eq('email', email).single();
+      
+      // Find user in mock data by email
+      const foundUser = MOCK_USERS.find(user => user.email === email);
+      if (!foundUser) {
+        throw new Error('Invalid email or password');
+      }
+      
+      // In real implementation, verify password hash
+      // const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+      // if (!isPasswordValid) throw new Error('Invalid email or password');
+      
       const mockUser: User = {
-        id: '1',
-        email,
-        name: email.split('@')[0],
-        role: email.includes('owner') ? 'owner' : 'customer',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        verified: true
+        ...foundUser
       };
       
       setUser(mockUser);
@@ -169,11 +163,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: userData.email,
         name: userData.name,
         phone: userData.phone,
-        role: userData.role,
-        businessName: userData.businessName,
-        businessAddress: userData.businessAddress,
+        role: userData.role || 'customer',
         createdAt: new Date(),
-        updatedAt: new Date(),
         verified: false
       };
       
