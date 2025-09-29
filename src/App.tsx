@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 
 // Authentication Provider
-import { AuthProvider, ProtectedRoute } from '@/contexts/EnhancedAuthContext';
+import OfflinePage from '@/pages/OfflinePage';
 import { BookingProvider } from '@/contexts/BookingContext';
 
 // Import pages

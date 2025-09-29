@@ -12,7 +12,8 @@ import {
   Plus,
   Edit,
   Save,
-  X
+  X,
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -172,6 +173,66 @@ const PricingTab = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* AI Pricing Suggestions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-purple-500" />
+            AI Pricing Suggestions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center">
+                  💡
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium text-blue-900 dark:text-blue-100">
+                    Optimize Off-Peak Hours
+                  </h4>
+                  <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                    Consider reducing prices by 15-20% for 6 AM - 10 AM slots to increase bookings. 
+                    Current occupancy: 40%
+                  </p>
+                  <Button size="sm" variant="outline" className="mt-3">
+                    Apply Suggestion
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center">
+                  📈
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium text-green-900 dark:text-green-100">
+                    Weekend Premium Pricing
+                  </h4>
+                  <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                    High demand detected for weekend evenings. Consider increasing prices by 25% 
+                    for Friday-Sunday 6 PM - 10 PM slots.
+                  </p>
+                  <Button size="sm" variant="outline" className="mt-3">
+                    Implement Premium
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center pt-4">
+              <Button variant="ghost" size="sm" className="text-muted-foreground">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Refresh Suggestions
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Pricing Rules List */}
       <Card>
