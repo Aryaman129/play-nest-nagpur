@@ -196,7 +196,22 @@ const BookingReceipt = ({ booking, onDownload, onPrint, onShare }: BookingReceip
       {/* Action Buttons */}
       <div className="flex gap-3 mt-6 print:hidden">
         {onDownload && (
-          <Button onClick={onDownload} variant="outline" className="flex-1">
+          <Button 
+            onClick={() => {
+              // **BACKEND INTEGRATION**: Generate PDF receipt
+              import('jspdf').then(({ jsPDF }) => {
+                const doc = new jsPDF();
+                doc.text(`PlayNest Receipt #${booking.receiptId}`, 10, 10);
+                doc.text(`Turf: ${booking.turfDetails.name}`, 10, 25);
+                doc.text(`Date: ${format(booking.slotStart, 'yyyy-MM-dd')}`, 10, 40);
+                doc.text(`Time: ${format(booking.slotStart, 'HH:mm')} - ${format(booking.slotEnd, 'HH:mm')}`, 10, 55);
+                doc.text(`Total: ₹${booking.price}`, 10, 70);
+                doc.save(`PlayNest-Receipt-${booking.receiptId}.pdf`);
+              });
+            }} 
+            variant="outline" 
+            className="flex-1"
+          >
             <Download className="w-4 h-4 mr-2" />
             Download PDF
           </Button>

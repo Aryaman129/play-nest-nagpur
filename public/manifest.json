@@ -1,0 +1,27 @@
+{
+  "name": "PlayNest - Sports Turf Booking",
+  "short_name": "PlayNest",
+  "description": "Book premium sports turfs and courts easily",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#22c55e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["sports", "lifestyle", "business"],
+  "shortcuts": [
+    {
+      "name": "Book Turf",
+      "short_name": "Book",
+      "description": "Quick turf booking",
+      "url": "/turfs",
+      "icons": [{ "src": "/favicon.ico", "sizes": "32x32" }]
+    }
+  ]
+}

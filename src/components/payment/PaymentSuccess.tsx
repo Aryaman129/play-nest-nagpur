@@ -22,18 +22,31 @@ const PaymentSuccess = ({
 }: PaymentSuccessProps) => {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      {/* Success Animation */}
+      {/* Success Animation with Sports Theme */}
       <motion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.6, ease: "backOut" }}
         className="text-center"
       >
-        <div className="w-20 h-20 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle className="w-12 h-12 text-green-600" />
-        </div>
-        <h1 className="text-2xl font-bold text-green-600 mb-2">Payment Successful!</h1>
-        <p className="text-muted-foreground">Your turf has been booked successfully</p>
+        {/* Animated Sports Success Icon */}
+        <motion.div
+          initial={{ rotateY: 180, scale: 0 }}
+          animate={{ rotateY: 0, scale: 1 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          className="w-24 h-24 mx-auto mb-4 text-6xl"
+        >
+          ⚽
+        </motion.div>
+        
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
+          <h1 className="text-3xl font-bold text-green-600 mb-2">🏆 Booking Confirmed!</h1>
+          <p className="text-muted-foreground text-lg">Get ready to play! Your turf is booked successfully</p>
+        </motion.div>
       </motion.div>
 
       {/* Booking Details Card */}

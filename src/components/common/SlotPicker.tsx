@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { format, addDays, startOfDay } from 'date-fns';
 import { motion } from 'framer-motion';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar, Clock, Users, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAppToast } from '@/components/common/Toast';
 import { cn } from '@/lib/utils';
 
 interface TimeSlot {
@@ -27,6 +28,7 @@ const SlotPicker: React.FC<SlotPickerProps> = ({
   availableSlots = []
 }) => {
   const [currentDate, setCurrentDate] = useState(selectedDate || new Date());
+  const { success, info } = useAppToast();
 
   // Mock time slots - replace with API data
   const mockTimeSlots: TimeSlot[] = [
@@ -52,6 +54,25 @@ const SlotPicker: React.FC<SlotPickerProps> = ({
   const handleTimeSlotSelect = (timeSlot: TimeSlot) => {
     if (timeSlot.isAvailable) {
       onSelect(currentDate, timeSlot);
+    }
+  };
+
+  // **BACKEND INTEGRATION**: Waitlist functionality
+  const handleWaitlistJoin = async (timeSlot: TimeSlot) => {
+    try {
+      // TODO: Implement backend waitlist API call
+      // await waitlistService.joinWaitlist({
+      //   turfId: 'current_turf_id',
+      //   slotStart: new Date(`${format(currentDate, 'yyyy-MM-dd')}T${timeSlot.startTime}`),
+      //   slotEnd: new Date(`${format(currentDate, 'yyyy-MM-dd')}T${timeSlot.endTime}`),
+      //   notifyEmail: 'user@email.com',
+      //   notifyPhone: '+91 9876543210'
+      // });
+
+      success('🔔 Joined waitlist successfully!');
+      info(`You'll be notified if ${timeSlot.startTime}-${timeSlot.endTime} becomes available on ${format(currentDate, 'MMM d')}`);
+    } catch (error) {
+      console.error('Waitlist join failed:', error);
     }
   };
 
@@ -105,19 +126,17 @@ const SlotPicker: React.FC<SlotPickerProps> = ({
             const isSelected = selectedSlot?.id === slot.id;
             
             return (
-              <motion.button
+              <motion.div
                 key={slot.id}
                 whileHover={slot.isAvailable ? { scale: 1.05 } : {}}
                 whileTap={slot.isAvailable ? { scale: 0.95 } : {}}
-                onClick={() => handleTimeSlotSelect(slot)}
-                disabled={!slot.isAvailable}
                 className={cn(
                   'p-4 rounded-lg border text-center transition-all duration-200',
                   slot.isAvailable
                     ? isSelected
                       ? 'bg-primary text-primary-foreground border-primary shadow-lg'
                       : 'bg-card text-card-foreground border-border hover:border-primary/50 hover:shadow-md'
-                    : 'bg-muted text-muted-foreground border-border cursor-not-allowed opacity-50'
+                    : 'bg-muted text-muted-foreground border-border opacity-75'
                 )}
               >
                 <div className="font-semibold text-sm">
@@ -126,12 +145,34 @@ const SlotPicker: React.FC<SlotPickerProps> = ({
                 <div className="text-xs mt-1">
                   ₹{slot.price}
                 </div>
-                {!slot.isAvailable && (
-                  <div className="text-xs text-destructive mt-1">
-                    Booked
+                
+                {slot.isAvailable ? (
+                  <Button
+                    size="sm"
+                    onClick={() => handleTimeSlotSelect(slot)}
+                    className="mt-2 w-full h-6 text-xs"
+                    variant={isSelected ? "secondary" : "default"}
+                    aria-label={`Book slot ${slot.startTime} to ${slot.endTime}`}
+                  >
+                    {isSelected ? 'Selected' : 'Book Now'}
+                  </Button>
+                ) : (
+                  <div className="mt-2 space-y-1">
+                    <div className="text-xs text-destructive">
+                      Fully Booked
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleWaitlistJoin(slot)}
+                      className="w-full h-6 text-xs"
+                      aria-label={`Join waitlist for ${slot.startTime} to ${slot.endTime}`}
+                    >
+                      📋 Join Waitlist
+                    </Button>
                   </div>
                 )}
-              </motion.button>
+              </motion.div>
             );
           })}
         </div>
